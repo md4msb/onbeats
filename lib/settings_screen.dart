@@ -18,7 +18,7 @@ class _SettingsState extends State<Settings> {
   }
 
   getSwitchValues() async {
-    notify = (await getSwitchState())!;
+    notify = await getSwitchState();
     setState(() {});
   }
 
@@ -29,12 +29,12 @@ class _SettingsState extends State<Settings> {
     return prefs.setBool("switchState", value);
   }
 
-  Future<bool?> getSwitchState() async {
+  Future<bool> getSwitchState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? notify = await prefs.getBool("switchState");
     print(notify);
 
-    return notify;
+    return notify != null ? notify : true;
   }
 
   @override
@@ -117,14 +117,12 @@ class _SettingsState extends State<Settings> {
                                 tail: Switch(
                                   value: notify,
                                   onChanged: (bool value) {
-
                                     setState(() {
                                       notify = value;
                                       saveSwitchState(value);
                                       print('Saved state is $notify');
                                     });
                                     print(notify);
-
                                   },
                                   activeTrackColor: Colors.pink[700],
                                   thumbColor:

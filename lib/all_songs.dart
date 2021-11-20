@@ -5,6 +5,7 @@ import 'package:music_app/database/data_model.dart';
 import 'package:music_app/playing_song.dart';
 import 'package:music_app/settings_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'open_assetaudio.dart';
 import 'dart:ui';
 
 class AllSongs extends StatefulWidget {
@@ -18,6 +19,8 @@ class _AllSongsState extends State<AllSongs> {
   final OnAudioQuery audioQuery = OnAudioQuery();
 
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
+
+  
 
   List<SongModel> songs = [];
 
@@ -111,11 +114,15 @@ class _AllSongsState extends State<AllSongs> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      audioPlayer.open(
-                        Playlist(audios: allSongs, startIndex: index),
-                        showNotification: true,
-                        autoStart: true,
-                      );
+                      
+                      OpenAssetAudio(allSongs: allSongs, index: index).open();
+                     
+                      // OpenAssetAudio.open();
+                      // audioPlayer.open(
+                      //   Playlist(audios: allSongs, startIndex: index),
+                      //   showNotification: true,
+                      //   autoStart: true,
+                      // );
                       Navigator.push(
                           context,
                           MaterialPageRoute(
