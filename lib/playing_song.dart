@@ -2,11 +2,12 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
+
 class PlayingScreen extends StatefulWidget {
   List<Audio> songs;
-  int index;
 
-  PlayingScreen({Key? key, required this.songs, required this.index})
+
+  PlayingScreen({Key? key, required this.songs, })
       : super(key: key);
 
   @override

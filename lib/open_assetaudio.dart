@@ -6,20 +6,22 @@ class OpenAssetAudio {
   List<Audio> allSongs;
   int index;
   bool? notify;
-  setNotifyValue() async {
+
+  Future<bool?>setNotifyValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     notify = await prefs.getBool("switchState");
-    print(notify);
+    print("Check playing screen notify : $notify");
+    return notify;
   }
 
   OpenAssetAudio({required this.allSongs, required this.index});
 
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
-  open() {
-    setNotifyValue();
+  open() async{
+    notify = await setNotifyValue();
     audioPlayer.open(
       Playlist(audios: allSongs, startIndex: index),
-      showNotification: notify == null || notify == true ? true : false,
+      showNotification: notify == null || notify == true ? true : false,      
       autoStart: true,
     );
   }

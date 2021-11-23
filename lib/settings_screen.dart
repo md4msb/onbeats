@@ -11,6 +11,9 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   bool notify = true;
 
+  final snackBartrue = SnackBar(content: Text('Notification turned on!',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
+  final snackBarfalse = SnackBar(content: Text('Notification turned off!',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
+
   @override
   void initState() {
     super.initState();
@@ -121,6 +124,14 @@ class _SettingsState extends State<Settings> {
                                       notify = value;
                                       saveSwitchState(value);
                                       print('Saved state is $notify');
+
+                                      if (notify == null || notify == true) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(snackBartrue);
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(snackBarfalse);
+                                      }
                                     });
                                     print(notify);
                                   },

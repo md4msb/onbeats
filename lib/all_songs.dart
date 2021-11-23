@@ -128,7 +128,7 @@ class _AllSongsState extends State<AllSongs> {
                           MaterialPageRoute(
                               builder: (context) => PlayingScreen(
                                     songs: allSongs,
-                                    index: index,
+                                   
                                   )));
                     },
                     onLongPress: () => showDialog(
