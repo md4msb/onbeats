@@ -1,14 +1,15 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-
 
 class PlayingScreen extends StatefulWidget {
   List<Audio> songs;
 
-
-  PlayingScreen({Key? key, required this.songs, })
-      : super(key: key);
+  PlayingScreen({
+    Key? key,
+    required this.songs,
+  }) : super(key: key);
 
   @override
   _PlayingScreenState createState() => _PlayingScreenState();
@@ -125,30 +126,39 @@ class _PlayingScreenState extends State<PlayingScreen> {
                 //!------------------------------------------
 
                 const SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
 
-                Container(
-                  margin: const EdgeInsets.only(left: 30, right: 30),
-                  width: MediaQuery.of(context).size.width,
-                  height: 3,
-                  color: Colors.grey[500],
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: 100,
-                      height: 3,
-                      color: Colors.purple[700],
+                assetAudioPlayer.builderRealtimePlayingInfos(
+                    builder: (context, RealtimePlayingInfos? infos) {
+                  if (infos == null) {
+                    return SizedBox();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 30),
+                    child: ProgressBar(
+                      timeLabelPadding: 10,
+                      thumbRadius: 0,
+                      baseBarColor: Colors.grey[500],
+                      progressBarColor: Colors.purple[700],
+                      thumbGlowRadius: 8,
+                      thumbGlowColor: Colors.purple[400],
+                      barHeight: 4,
+                      progress: infos.currentPosition,
+                      total: infos.duration,
+                      onSeek: (duration) {
+                        assetAudioPlayer.seek(duration);
+                      },
                     ),
-                  ),
-                ),
+                  );
+                }),
 
                 //!------------------------------------------
                 //!<<<song action buttons>>>
                 //!------------------------------------------
 
                 const SizedBox(
-                  height: 30,
+                  height: 5,
                 ),
 
                 Row(
