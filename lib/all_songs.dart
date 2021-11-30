@@ -16,26 +16,28 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
+  late TextEditingController controller;
+
   final OnAudioQuery audioQuery = OnAudioQuery();
-
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
-
-  
-
-  List<SongModel> songs = [];
-
-  List<DataModel> mappedSongs = [];
-
   final box = Boxes.getSongsDb();
 
+  List<SongModel> songs = [];
+  List<DataModel> mappedSongs = [];
   List<DataModel>? dbSongs = [];
-
   List<Audio> allSongs = [];
 
   @override
   void initState() {
     super.initState();
     requestPermission();
+    controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   requestPermission() async {
@@ -58,7 +60,7 @@ class _AllSongsState extends State<AllSongs> {
 
     dbSongs = await box.get("musics");
 
-    dbSongs!.forEach( 
+    dbSongs!.forEach(
       (element) {
         allSongs.add(
           Audio.file(
@@ -114,21 +116,13 @@ class _AllSongsState extends State<AllSongs> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      
                       OpenAssetAudio(allSongs: allSongs, index: index).open();
-                     
-                      // OpenAssetAudio.open();
-                      // audioPlayer.open(
-                      //   Playlist(audios: allSongs, startIndex: index),
-                      //   showNotification: true,
-                      //   autoStart: true,
-                      // );
+
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => PlayingScreen(
                                     songs: allSongs,
-                                   
                                   )));
                     },
                     onLongPress: () => showDialog(
@@ -165,7 +159,15 @@ class _AllSongsState extends State<AllSongs> {
                                   ListTile(
                                     title: Text("Add to Playlist"),
                                     trailing: Icon(Icons.add),
-                                    onTap: () {},
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(25))),
+                                        context: context,
+                                        builder: (context) => buildSheet(),
+                                      );
+                                    },
                                   ),
                                   ListTile(
                                     title: Text("Add to Favorites"),
@@ -280,5 +282,75 @@ class _AllSongsState extends State<AllSongs> {
         ),
       ),
     );
+  }
+
+  Widget buildSheet() => Container(
+        padding: EdgeInsets.only(top: 20, bottom: 20),
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          children: [
+            libraryList(
+              child: ListTile(
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(
+                      "Give your playlist a name",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    content: TextField(
+                      controller: controller,
+                      autofocus: true,
+                      cursorRadius: const Radius.circular(50),
+                      cursorColor: Colors.grey,
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: submit,
+                          child: Text(
+                            "SUMBIT",
+                            style: TextStyle(
+                              color: Colors.pink[500],
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
+                leading: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF606060),
+                    borderRadius: BorderRadius.all(Radius.circular(17)),
+                  ),
+                  child: Center(
+                      child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 28,
+                  )),
+                ),
+                title: Text(
+                  "Create Playlist",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Padding libraryList({required child}) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+        child: child);
+  }
+
+  void submit() {
+    Navigator.of(context).pop();
+    controller.clear();
   }
 }
