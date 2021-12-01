@@ -44,7 +44,6 @@ class _AllSongsState extends State<AllSongs> {
     super.initState();
     requestPermission();
     controller = TextEditingController();
-    
   }
 
   @override
@@ -175,7 +174,6 @@ class _AllSongsState extends State<AllSongs> {
                                     trailing: Icon(Icons.add),
                                     onTap: () {
                                       showModalBottomSheet(
-                                        
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
                                                 top: Radius.circular(20))),
@@ -299,91 +297,94 @@ class _AllSongsState extends State<AllSongs> {
     );
   }
 
-  Widget buildSheet() { 
+  Widget buildSheet() {
     playlists = box.keys.toList();
     return Container(
-        padding: EdgeInsets.only(top: 20, bottom: 20),
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
-          children: [
-            libraryList(
-              child: ListTile(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(
-                      "Give your playlist a name",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    content: TextField(
-                      controller: controller,
-                      autofocus: true,
-                      cursorRadius: const Radius.circular(50),
-                      cursorColor: Colors.grey,
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: submit,
-                          child: Text(
-                            "CREATE",
-                            style: TextStyle(
-                              color: Colors.pink[500],
-                            ),
-                          ))
-                    ],
+      padding: EdgeInsets.only(top: 20, bottom: 20),
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        children: [
+          libraryList(
+            child: ListTile(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(
+                    "Give your playlist a name",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
                   ),
+                  content: TextField(
+                    controller: controller,
+                    autofocus: true,
+                    cursorRadius: const Radius.circular(50),
+                    cursorColor: Colors.grey,
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: submit,
+                        child: Text(
+                          "CREATE",
+                          style: TextStyle(
+                            color: Colors.pink[500],
+                          ),
+                        ))
+                  ],
                 ),
-                leading: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF606060),
-                    borderRadius: BorderRadius.all(Radius.circular(17)),
-                  ),
-                  child: Center(
-                      child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 28,
-                  )),
+              ),
+              leading: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: Color(0xFF606060),
+                  borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
-                title: Text(
-                  "Create Playlist",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Center(
+                    child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 28,
+                )),
+              ),
+              title: Text(
+                "Create Playlist",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            ...playlists
-                .map((e) => e!= "musics" ? GestureDetector(
-                    onTap: () {},
-                    child:  libraryList(
-                        child: ListTile(
-                      leading: Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("assets/images/searchpre.jpg"),
-                              fit: BoxFit.cover),
-                          borderRadius: BorderRadius.all(Radius.circular(17)),
+          ),
+          ...playlists
+              .map((e) => e != "musics"
+                  ? GestureDetector(
+                      onTap: () {},
+                      child: libraryList(
+                          child: ListTile(
+                        leading: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image:
+                                    AssetImage("assets/images/searchpre.jpg"),
+                                fit: BoxFit.cover),
+                            borderRadius: BorderRadius.all(Radius.circular(17)),
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        e.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        title: Text(
+                          e.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ))
-                    // Text(e.toString())
-                    ) : Container() ) 
-                .toList()
-          ],
-        ),
-      );
+                      ))
+                      // Text(e.toString())
+                      )
+                  : Container())
+              .toList()
+        ],
+      ),
+    );
   }
 
   Padding libraryList({required child}) {
@@ -395,7 +396,6 @@ class _AllSongsState extends State<AllSongs> {
   void submit() {
     playlistName = controller.text;
 
-    print(playlists);
     List? excistingName = [];
     if (playlists.length > 0) {
       excistingName =
@@ -405,9 +405,7 @@ class _AllSongsState extends State<AllSongs> {
     if (playlistName != '' && excistingName.length == 0) {
       box.put(playlistName, library);
       Navigator.of(context).pop();
-      setState(() {
-        
-      });
+      setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(excistingPlaylist);
     }

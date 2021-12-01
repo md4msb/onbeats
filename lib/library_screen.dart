@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:music_app/favorites.dart';
-
+import 'database/boxes.dart';
+import 'database/data_model.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({Key? key}) : super(key: key);
@@ -11,6 +12,38 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
+  late TextEditingController controller;
+
+  final excistingPlaylist = SnackBar(
+    content: Text(
+      'Excisting playlist name',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: Colors.grey[900],
+  );
+
+  final box = Boxes.getSongsDb();
+  List playlists = [];
+
+  List<DataModel> library = [];
+
+  String? playlistName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController();
+    
+    playlists = box.keys.toList();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,66 +86,94 @@ class _LibraryScreenState extends State<LibraryScreen> {
               ],
             ),
           ),
-            libraryList(
-              child: ListTile(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(
-                      "Give your playlist a name",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    content: TextField(
-                      // controller: controller,
-                      autofocus: true,
-                      cursorRadius: const Radius.circular(50),
-                      cursorColor: Colors.grey,
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: (){
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            "CREATE",
-                            style: TextStyle(
-                              color: Colors.pink[500],
-                            ),
-                          ))
-                    ],
+          libraryList(
+            child: ListTile(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(
+                    "Give your playlist a name",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
                   ),
+                  content: TextField(
+                    controller: controller,
+                    autofocus: true,
+                    cursorRadius: const Radius.circular(50),
+                    cursorColor: Colors.grey,
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          submit();
+                          
+                        },
+                        child: Text(
+                          "CREATE",
+                          style: TextStyle(
+                            color: Colors.pink[500],
+                          ),
+                        ))
+                  ],
                 ),
-                leading: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF606060),
-                    borderRadius: BorderRadius.all(Radius.circular(17)),
-                  ),
-                  child: Center(
-                      child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 28,
-                  )),
+              ),
+              leading: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: Color(0xFF606060),
+                  borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
-                title: Text(
-                  "Create Playlist",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Center(
+                    child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 28,
+                )),
+              ),
+              title: Text(
+                "Create Playlist",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-
+          ),
           libraryLists(
               title: "Liked Songs",
-         
               leadIcon: Icons.favorite_border_rounded,
               leadSize: 22,
               leadClr: Colors.pink[400],
               tail: Icons.arrow_forward_ios),
+
+                        ...playlists
+              .map((e) => e != "musics"
+                  ? GestureDetector(
+                      onTap: () {},
+                      child: libraryList(
+                          child: ListTile(
+                        leading: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image:
+                                    AssetImage("assets/images/searchpre.jpg"),
+                                fit: BoxFit.cover),
+                            borderRadius: BorderRadius.all(Radius.circular(17)),
+                          ),
+                        ),
+                        title: Text(
+                          e.toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ))
+                      // Text(e.toString())
+                      )
+                  : Container())
+              .toList()
         ],
       ),
     );
@@ -120,7 +181,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   Padding libraryLists(
       {required title,
- 
       leadIcon = Icons.music_note_rounded,
       double leadSize = 28,
       tail,
@@ -128,8 +188,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Padding(
       padding: const EdgeInsets.only(left: 5, right: 5, bottom: 15),
       child: ListTile(
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Favorites())),
+        onTap: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Favorites())),
         leading: Container(
           height: 50,
           width: 50,
@@ -158,9 +218,32 @@ class _LibraryScreenState extends State<LibraryScreen> {
     );
   }
 
-    Padding libraryList({required child}) {
+  Padding libraryList({required child}) {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
         child: child);
+  }
+
+  void submit() {
+    playlistName = controller.text;
+    
+
+    List? excistingName = [];
+    if (playlists.length > 0) {
+      excistingName =
+          playlists.where((element) => element == playlistName).toList();
+    }
+
+    if (playlistName != '' && excistingName.length == 0) {
+      box.put(playlistName, library);
+      Navigator.of(context).pop();
+      setState(() {
+        playlists = box.keys.toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(excistingPlaylist);
+    }
+
+    controller.clear();
   }
 }
