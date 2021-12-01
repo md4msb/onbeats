@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:music_app/favorites.dart';
+import 'package:music_app/playlist_screen.dart';
 import 'database/boxes.dart';
 import 'database/data_model.dart';
 
@@ -148,30 +149,32 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
                         ...playlists
               .map((e) => e != "musics"
-                  ? GestureDetector(
-                      onTap: () {},
-                      child: libraryList(
-                          child: ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image:
-                                    AssetImage("assets/images/searchpre.jpg"),
-                                fit: BoxFit.cover),
-                            borderRadius: BorderRadius.all(Radius.circular(17)),
-                          ),
-                        ),
-                        title: Text(
-                          e.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ))
-                      // Text(e.toString())
-                      )
+                  ? libraryList(
+                      child: ListTile(
+                        onTap: (){
+                          Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  PlaylistScreen(playlistName: e,)),
+                  );
+                        },
+                    leading: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image:
+                                AssetImage("assets/images/searchpre.jpg"),
+                            fit: BoxFit.cover),
+                        borderRadius: BorderRadius.all(Radius.circular(17)),
+                      ),
+                    ),
+                    title: Text(
+                      e.toString(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ))
                   : Container())
               .toList()
         ],
