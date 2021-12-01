@@ -3,19 +3,13 @@ import 'package:hive/hive.dart';
 import 'database/data_model.dart';
 import 'home_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
-
-
-void main () async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await Hive.initFlutter();
   Hive.registerAdapter(DataModelAdapter());
   await Hive.openBox<List<DataModel>>("songData");
-
-
-  
 
   runApp(MyApp());
 }

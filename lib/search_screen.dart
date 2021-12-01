@@ -65,16 +65,20 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ],
           ),
-
-          searchSongList(title: "Song Title",tail: Icons.play_arrow_rounded,),
-          searchSongList(title: "Song Title",tail: Icons.play_arrow_rounded,)
-
+          searchSongList(
+            title: "Song Title",
+            tail: Icons.play_arrow_rounded,
+          ),
+          searchSongList(
+            title: "Song Title",
+            tail: Icons.play_arrow_rounded,
+          )
         ],
       ),
     );
   }
 
-    Padding searchSongList(
+  Padding searchSongList(
       {required title,
       leadIcon = Icons.music_note_rounded,
       double leadSize = 28,
@@ -87,18 +91,12 @@ class _SearchScreenState extends State<SearchScreen> {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/images/searchpre.jpg"),fit: BoxFit.cover),
+            image: DecorationImage(
+                image: AssetImage("assets/images/searchpre.jpg"),
+                fit: BoxFit.cover),
             color: leadClr,
             borderRadius: BorderRadius.all(Radius.circular(17)),
-            
           ),
-          
-          child: Center(
-              child: Icon(
-            leadIcon,
-            color: Colors.white,
-            size: leadSize,
-          )),
         ),
         title: Text(
           title,

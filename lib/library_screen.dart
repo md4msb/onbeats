@@ -53,12 +53,60 @@ class _LibraryScreenState extends State<LibraryScreen> {
               ],
             ),
           ),
-          libraryList(
-              title: "Create Playlist",
-            
-              leadIcon: Icons.add,
-              leadClr: Color(0xFF606060)),
-          libraryList(
+            libraryList(
+              child: ListTile(
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(
+                      "Give your playlist a name",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    content: TextField(
+                      // controller: controller,
+                      autofocus: true,
+                      cursorRadius: const Radius.circular(50),
+                      cursorColor: Colors.grey,
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            "CREATE",
+                            style: TextStyle(
+                              color: Colors.pink[500],
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
+                leading: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF606060),
+                    borderRadius: BorderRadius.all(Radius.circular(17)),
+                  ),
+                  child: Center(
+                      child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 28,
+                  )),
+                ),
+                title: Text(
+                  "Create Playlist",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+          libraryLists(
               title: "Liked Songs",
          
               leadIcon: Icons.favorite_border_rounded,
@@ -70,7 +118,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     );
   }
 
-  Padding libraryList(
+  Padding libraryLists(
       {required title,
  
       leadIcon = Icons.music_note_rounded,
@@ -108,5 +156,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
         ),
       ),
     );
+  }
+
+    Padding libraryList({required child}) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+        child: child);
   }
 }
