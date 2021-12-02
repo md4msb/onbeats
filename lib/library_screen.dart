@@ -143,7 +143,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           libraryLists(
               title: "Liked Songs",
               leadIcon: Icons.favorite_border_rounded,
-              leadSize: 22,
+              leadSize: 23,
               leadClr: Colors.pink[400],
               tail: Icons.arrow_forward_ios),
 

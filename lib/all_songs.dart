@@ -7,6 +7,7 @@ import 'package:music_app/settings_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'open_assetaudio.dart';
 import 'dart:ui';
+import 'package:music_app/widgets/snackbars.dart';
 
 class AllSongs extends StatefulWidget {
   const AllSongs({Key? key}) : super(key: key);
@@ -16,27 +17,21 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
-
   //!---------------------------------
   //! <<---------- playlist --------->>
   late TextEditingController controller;
-  final excistingPlaylist = SnackBar(
-    content: Text(
-      'Excisting playlist name',
-      style: TextStyle(color: Colors.white),
-    ),
-    backgroundColor: Colors.grey[900],
-  );
+
 
   List playlists = [];
-  List<DataModel> library = [];
+  List<dynamic>? playlistSongs = [];
   String? playlistName = '';
   //!-------------------------------->>>
-
 
   final OnAudioQuery audioQuery = OnAudioQuery();
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
   final box = Boxes.getSongsDb();
+
+
 
   List<SongModel> songs = [];
   List<DataModel> mappedSongs = [];
@@ -48,6 +43,8 @@ class _AllSongsState extends State<AllSongs> {
     super.initState();
     requestPermission();
     controller = TextEditingController();
+
+    print(playlistSongs);
   }
 
   @override
@@ -177,12 +174,14 @@ class _AllSongsState extends State<AllSongs> {
                                     title: Text("Add to Playlist"),
                                     trailing: Icon(Icons.add),
                                     onTap: () {
+                                      Navigator.of(context).pop();
                                       showModalBottomSheet(
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
                                                 top: Radius.circular(20))),
                                         context: context,
-                                        builder: (context) => buildSheet(),
+                                        builder: (context) =>
+                                            buildSheet(song: dbSongs![index]),
                                       );
                                     },
                                   ),
@@ -192,7 +191,9 @@ class _AllSongsState extends State<AllSongs> {
                                       Icons.favorite_border_rounded,
                                       // color: Colors.redAccent,
                                     ),
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
                                   )
                                 ],
                               ),
@@ -301,7 +302,7 @@ class _AllSongsState extends State<AllSongs> {
     );
   }
 
-  Widget buildSheet() {
+  Widget buildSheet({required song}) {
     playlists = box.keys.toList();
     return Container(
       padding: EdgeInsets.only(top: 20, bottom: 20),
@@ -360,30 +361,49 @@ class _AllSongsState extends State<AllSongs> {
           ),
           ...playlists
               .map((e) => e != "musics"
-                  ? GestureDetector(
-                      onTap: () {},
-                      child: libraryList(
-                          child: ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image:
-                                    AssetImage("assets/images/searchpre.jpg"),
-                                fit: BoxFit.cover),
-                            borderRadius: BorderRadius.all(Radius.circular(17)),
-                          ),
+                  ? libraryList(
+                      child: ListTile(
+                      onTap: () async {
+                        print(song.title);
+                        print(e);
+                        playlistSongs = box.get(e);
+                        List existingSongs = [];
+                        existingSongs = playlistSongs!
+                            .where((element) =>
+                                element.id.toString() == song.id.toString())
+                            .toList();
+
+                        if (existingSongs.isEmpty) {
+                          
+                          playlistSongs?.add(song);
+                          await box.put(e, playlistSongs!);
+
+                          setState(() {});
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBars().songAdded);
+                        } else {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBars().excistingSong);
+                        }
+                      },
+                      leading: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("assets/images/searchpre.jpg"),
+                              fit: BoxFit.cover),
+                          borderRadius: BorderRadius.all(Radius.circular(17)),
                         ),
-                        title: Text(
-                          e.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      title: Text(
+                        e.toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                      ))
-                      // Text(e.toString())
-                      )
+                      ),
+                    ))
                   : Container())
               .toList()
         ],
@@ -397,7 +417,7 @@ class _AllSongsState extends State<AllSongs> {
         child: child);
   }
 
-  void submit() {
+  void submit() async {
     playlistName = controller.text;
 
     List? excistingName = [];
@@ -407,11 +427,11 @@ class _AllSongsState extends State<AllSongs> {
     }
 
     if (playlistName != '' && excistingName.length == 0) {
-      box.put(playlistName, library);
+      await box.put(playlistName, playlistSongs!);
       Navigator.of(context).pop();
       setState(() {});
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(excistingPlaylist);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBars().excistingPlaylist);
     }
 
     controller.clear();

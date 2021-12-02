@@ -88,7 +88,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             ),
           ),
           SizedBox(
-            height: 40,
+            height: 35,
           ),
           Expanded(
             child: ValueListenableBuilder(
@@ -96,39 +96,42 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 builder: (context, Box boxes, _) {
                   List<dynamic> playlistSongs = boxes.get(widget.playlistName);
                   return ListView.builder(
+                    physics: BouncingScrollPhysics(),
                     itemCount: playlistSongs.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: ListTile(
-                        leading: Container(
-                          height: 50,
-                          width: 50,
-                          child: QueryArtworkWidget(
-                            id: playlistSongs[index].id,
-                            type: ArtworkType.AUDIO,
-                            artworkBorder: BorderRadius.circular(15),
-                            artworkFit: BoxFit.cover,
-                            nullArtworkWidget: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                                image: DecorationImage(
-                                  image:
-                                      AssetImage("assets/images/default.png"),
-                                  fit: BoxFit.cover,
-                                ),
+                    itemBuilder: (context, index) => ListTile(
+                      leading: Container(
+                        height: 50,
+                        width: 50,
+                        child: QueryArtworkWidget(
+                          id: playlistSongs[index].id,
+                          type: ArtworkType.AUDIO,
+                          artworkBorder: BorderRadius.circular(15),
+                          artworkFit: BoxFit.cover,
+                          nullArtworkWidget: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                              image: DecorationImage(
+                                image:
+                                    AssetImage("assets/images/default.png"),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
                         ),
-                        title: Text(
-                          playlistSongs[index].title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
+                      ),
+                      title: Text(
+                        playlistSongs[index].title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        playlistSongs[index].artist,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   );
@@ -139,5 +142,3 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     );
   }
 }
-
-

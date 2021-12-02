@@ -36,7 +36,6 @@ class _buildSheetState extends State<buildSheet> {
           physics: const BouncingScrollPhysics(),
           itemCount: dbSongs!.length,
           itemBuilder: (context, index) {
-            playlistSongs = box.get(widget.playlistName);
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: ListTile(
@@ -84,7 +83,9 @@ class _buildSheetState extends State<buildSheet> {
                         icon: Icon(Icons.add))
                     : IconButton(
                         onPressed: () async {
-                          playlistSongs?.remove(dbSongs![index]);
+                          playlistSongs?.removeWhere((elemet) =>
+                              elemet.id.toString() ==
+                              dbSongs![index].id.toString());
                           await box.put(widget.playlistName, playlistSongs!);
                           setState(() {});
                         },
