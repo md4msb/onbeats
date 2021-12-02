@@ -19,7 +19,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
   final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
 
   Audio find(List<Audio> source, String fromPath) {
-    print("object");
+
     return source.firstWhere((element) => element.path == fromPath);
   }
 

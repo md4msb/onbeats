@@ -16,8 +16,10 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
-  late TextEditingController controller;
 
+  //!---------------------------------
+  //! <<---------- playlist --------->>
+  late TextEditingController controller;
   final excistingPlaylist = SnackBar(
     content: Text(
       'Excisting playlist name',
@@ -26,18 +28,20 @@ class _AllSongsState extends State<AllSongs> {
     backgroundColor: Colors.grey[900],
   );
 
+  List playlists = [];
+  List<DataModel> library = [];
+  String? playlistName = '';
+  //!-------------------------------->>>
+
+
   final OnAudioQuery audioQuery = OnAudioQuery();
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
   final box = Boxes.getSongsDb();
-  List playlists = [];
 
   List<SongModel> songs = [];
   List<DataModel> mappedSongs = [];
   List<DataModel>? dbSongs = [];
   List<Audio> allSongs = [];
-  List<DataModel> library = [];
-
-  String? playlistName = '';
 
   @override
   void initState() {
@@ -71,7 +75,7 @@ class _AllSongsState extends State<AllSongs> {
 
     await box.put("musics", mappedSongs);
 
-    dbSongs = await box.get("musics");
+    dbSongs = await box.get("musics") as List<DataModel>;
 
     dbSongs!.forEach(
       (element) {

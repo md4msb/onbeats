@@ -9,7 +9,7 @@ void main() async {
 
   await Hive.initFlutter();
   Hive.registerAdapter(DataModelAdapter());
-  await Hive.openBox<List<DataModel>>("songData");
+  await Hive.openBox<List<dynamic>>("songData");
 
   runApp(MyApp());
 }
