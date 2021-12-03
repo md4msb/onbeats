@@ -31,11 +31,13 @@ class _PlayingScreenState extends State<PlayingScreen> {
   List playlists = [];
   List<dynamic>? playlistSongs = [];
   String? playlistName = '';
+  List<DataModel> dbSongs = [];
+  List<dynamic>? likedSongs = [];
 
   @override
   void initState() {
     super.initState();
-
+    dbSongs = box.get("musics") as List<DataModel>;
     controller = TextEditingController();
   }
 
@@ -72,6 +74,11 @@ class _PlayingScreenState extends State<PlayingScreen> {
         body: assetAudioPlayer.builderCurrent(
             builder: (context, Playing? playing) {
           final myAudio = find(widget.songs, playing!.audio.assetAudioPath);
+
+          final currentSong = dbSongs.firstWhere((element) =>
+              element.id.toString() == myAudio.metas.id.toString());
+
+          likedSongs = box.get("favorites");
 
           return Center(
             child: Column(
@@ -246,13 +253,35 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.favorite,
-                                color: Colors.redAccent,
-                                size: 30,
-                              )),
+                          likedSongs!
+                                  .where((element) =>
+                                      element.id.toString() ==
+                                      currentSong.id.toString())
+                                  .isEmpty
+                              ? IconButton(
+                                  onPressed: () async {
+                                    likedSongs?.add(currentSong);
+                                    await box.put("favorites", likedSongs!);
+
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite_border_rounded,
+                                    size: 30,
+                                  ))
+                              : IconButton(
+                                  onPressed: () async {
+                                    likedSongs?.removeWhere((elemet) =>
+                                        elemet.id.toString() ==
+                                        currentSong.id.toString());
+                                    await box.put("favorites", likedSongs!);
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite_rounded,
+                                    color: Colors.redAccent,
+                                    size: 30,
+                                  )),
                           IconButton(
                               onPressed: () {
                                 showModalBottomSheet(
@@ -261,16 +290,8 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                             top: Radius.circular(20))),
                                     context: context,
                                     builder: (context) {
-                                      List<DataModel> dbSongs =
-                                          box.get("musics") as List<DataModel>;
-                                      final currentSong = dbSongs
-                                          .firstWhere((element) =>
-                                              element.id.toString() ==
-                                              myAudio.metas.id.toString());
-                                          
                                       print(currentSong.title);
                                       return buildSheet(song: currentSong);
-                                      
                                     });
                               },
                               icon: const Icon(
@@ -354,12 +375,10 @@ class _PlayingScreenState extends State<PlayingScreen> {
             ),
           ),
           ...playlists
-              .map((e) => e != "musics"
+              .map((e) => e != "musics" && e != "favorites"
                   ? libraryList(
                       child: ListTile(
                       onTap: () async {
-                        print(song.title);
-                        print(e);
                         playlistSongs = box.get(e);
                         List existingSongs = [];
                         existingSongs = playlistSongs!

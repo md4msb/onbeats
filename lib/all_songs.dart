@@ -22,6 +22,8 @@ class _AllSongsState extends State<AllSongs> {
   List<dynamic>? playlistSongs = [];
   String? playlistName = '';
 
+  List<dynamic>? likedSongs = [];
+
   final OnAudioQuery audioQuery = OnAudioQuery();
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
   final box = Boxes.getSongsDb();
@@ -36,6 +38,7 @@ class _AllSongsState extends State<AllSongs> {
     super.initState();
     requestPermission();
     controller = TextEditingController();
+    likedSongs = box.get("favorites");
   }
 
   @override
@@ -133,6 +136,7 @@ class _AllSongsState extends State<AllSongs> {
                     onLongPress: () => showDialog(
                       context: context,
                       builder: (BuildContext context) {
+                        likedSongs = box.get("favorites");
                         return Dialog(
                           backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
@@ -176,16 +180,48 @@ class _AllSongsState extends State<AllSongs> {
                                       );
                                     },
                                   ),
-                                  ListTile(
-                                    title: Text("Add to Favorites"),
-                                    trailing: Icon(
-                                      Icons.favorite_border_rounded,
-                                      // color: Colors.redAccent,
-                                    ),
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  )
+                                  likedSongs!
+                                          .where((element) =>
+                                              element.id.toString() ==
+                                              dbSongs[index].id.toString())
+                                          .isEmpty
+                                      ? ListTile(
+                                          title: Text("Add to Favorites"),
+                                          trailing: Icon(
+                                            Icons.favorite_border_rounded,
+                                            // color: Colors.redAccent,
+                                          ),
+                                          onTap: () async {
+                                            likedSongs?.add(dbSongs[index]);
+                                            await box.put(
+                                                "favorites", likedSongs!);
+
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                    SnackBars().likedAdd);
+                                          },
+                                        )
+                                      : ListTile(
+                                          title: Text("Remove from Favorites"),
+                                          trailing: Icon(
+                                            Icons.favorite_rounded,
+                                            color: Colors.redAccent,
+                                          ),
+                                          onTap: () async {
+                                            likedSongs?.removeWhere((elemet) =>
+                                                elemet.id.toString() ==
+                                                dbSongs[index].id.toString());
+                                            await box.put(
+                                                "favorites", likedSongs!);
+                                            setState(() {});
+
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                    SnackBars().likedRemove);
+                                          },
+                                        )
                                 ],
                               ),
                             ),
@@ -351,12 +387,10 @@ class _AllSongsState extends State<AllSongs> {
             ),
           ),
           ...playlists
-              .map((e) => e != "musics"
+              .map((e) => e != "musics" && e != "favorites"
                   ? libraryList(
                       child: ListTile(
                       onTap: () async {
-                        print(song.title);
-                        print(e);
                         playlistSongs = box.get(e);
                         List existingSongs = [];
                         existingSongs = playlistSongs!

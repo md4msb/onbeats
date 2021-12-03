@@ -28,14 +28,12 @@ class _SettingsState extends State<Settings> {
   Future<bool> saveSwitchState(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("switchState", value);
-    print('Switch Value saved $value');
     return prefs.setBool("switchState", value);
   }
 
   Future<bool> getSwitchState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? notify = await prefs.getBool("switchState");
-    print(notify);
 
     return notify != null ? notify : true;
   }

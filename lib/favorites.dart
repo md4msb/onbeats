@@ -1,4 +1,11 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:music_app/database/boxes.dart';
+import 'package:music_app/playing_song.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+
+import 'open_assetaudio.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -8,6 +15,8 @@ class Favorites extends StatefulWidget {
 }
 
 class _FavoritesState extends State<Favorites> {
+  List<Audio> playLiked = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +30,8 @@ class _FavoritesState extends State<Favorites> {
           },
         ),
       ),
-      body: ListView(
-        physics: BouncingScrollPhysics(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 12),
@@ -37,9 +46,76 @@ class _FavoritesState extends State<Favorites> {
           SizedBox(
             height: 20,
           ),
-          likedSongList(title: "Song Title"),
-          likedSongList(title: "Song Title"),
-          likedSongList(title: "Song Title"),
+          Expanded(
+              child: ValueListenableBuilder(
+                  valueListenable: Boxes.getSongsDb().listenable(),
+                  builder: (context, Box boxes, _) {
+                    List<dynamic> likedSongs = boxes.get("favorites");
+                    return ListView.builder(
+                        itemCount: likedSongs.length,
+                        itemBuilder: (context, index) => GestureDetector(
+                              onTap: () {
+                                likedSongs.forEach((element) {
+                                  playLiked.add(
+                                    Audio.file(
+                                      element.path,
+                                      metas: Metas(
+                                        title: element.title,
+                                        id: element.id.toString(),
+                                        artist: element.artist,
+                                      ),
+                                    ),
+                                  );
+                                });
+                                OpenAssetAudio(
+                                        allSongs: playLiked, index: index)
+                                    .open();
+
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PlayingScreen(
+                                              songs: playLiked,
+                                            )));
+                              },
+                              child: ListTile(
+                                leading: Container(
+                                  height: 50,
+                                  width: 50,
+                                  child: QueryArtworkWidget(
+                                    id: likedSongs[index].id,
+                                    type: ArtworkType.AUDIO,
+                                    artworkBorder: BorderRadius.circular(15),
+                                    artworkFit: BoxFit.cover,
+                                    nullArtworkWidget: Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: const BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/default.png"),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  likedSongs[index].title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                subtitle: Text(
+                                  likedSongs[index].artist,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ));
+                  }))
         ],
       ),
     );

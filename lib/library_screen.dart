@@ -148,7 +148,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
               tail: Icons.arrow_forward_ios),
 
                         ...playlists
-              .map((e) => e != "musics"
+              .map((e) => e != "musics" && e!= "favorites"
                   ? libraryList(
                       child: ListTile(
                         onTap: (){
