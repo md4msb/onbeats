@@ -1,4 +1,7 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:music_app/open_assetaudio.dart';
+import 'package:music_app/playing_song.dart';
 import 'package:music_app/widgets/playlist_bottomsheet.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -18,6 +21,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   List<dynamic>? dbSongs = [];
 
   List<dynamic>? playlistSongs = [];
+  List<Audio> playPlaylist = [];
 
   final box = Boxes.getSongsDb();
 
@@ -98,40 +102,67 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                   return ListView.builder(
                     physics: BouncingScrollPhysics(),
                     itemCount: playlistSongs.length,
-                    itemBuilder: (context, index) => ListTile(
-                      leading: Container(
-                        height: 50,
-                        width: 50,
-                        child: QueryArtworkWidget(
-                          id: playlistSongs[index].id,
-                          type: ArtworkType.AUDIO,
-                          artworkBorder: BorderRadius.circular(15),
-                          artworkFit: BoxFit.cover,
-                          nullArtworkWidget: Container(
-                            height: 50,
-                            width: 50,
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              image: DecorationImage(
-                                image:
-                                    AssetImage("assets/images/default.png"),
-                                fit: BoxFit.cover,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {
+                        playlistSongs.forEach(
+                          (element) {
+                            playPlaylist.add(
+                              Audio.file(
+                                element.path,
+                                metas: Metas(
+                                  title: element.title,
+                                  id: element.id.toString(),
+                                  artist: element.artist,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                        OpenAssetAudio(allSongs: playPlaylist, index: index)
+                            .open();
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PlayingScreen(
+                                      songs: playPlaylist,
+                                    )));
+                      },
+                      child: ListTile(
+                        leading: Container(
+                          height: 50,
+                          width: 50,
+                          child: QueryArtworkWidget(
+                            id: playlistSongs[index].id,
+                            type: ArtworkType.AUDIO,
+                            artworkBorder: BorderRadius.circular(15),
+                            artworkFit: BoxFit.cover,
+                            nullArtworkWidget: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                image: DecorationImage(
+                                  image:
+                                      AssetImage("assets/images/default.png"),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      title: Text(
-                        playlistSongs[index].title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      subtitle: Text(
-                        playlistSongs[index].artist,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        title: Text(
+                          playlistSongs[index].title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: Text(
+                          playlistSongs[index].artist,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   );

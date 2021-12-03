@@ -17,25 +17,18 @@ class AllSongs extends StatefulWidget {
 }
 
 class _AllSongsState extends State<AllSongs> {
-  //!---------------------------------
-  //! <<---------- playlist --------->>
   late TextEditingController controller;
-
-
   List playlists = [];
   List<dynamic>? playlistSongs = [];
   String? playlistName = '';
-  //!-------------------------------->>>
 
   final OnAudioQuery audioQuery = OnAudioQuery();
   final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
   final box = Boxes.getSongsDb();
 
-
-
   List<SongModel> songs = [];
   List<DataModel> mappedSongs = [];
-  List<DataModel>? dbSongs = [];
+  List<DataModel> dbSongs = [];
   List<Audio> allSongs = [];
 
   @override
@@ -43,8 +36,6 @@ class _AllSongsState extends State<AllSongs> {
     super.initState();
     requestPermission();
     controller = TextEditingController();
-
-    print(playlistSongs);
   }
 
   @override
@@ -72,9 +63,9 @@ class _AllSongsState extends State<AllSongs> {
 
     await box.put("musics", mappedSongs);
 
-    dbSongs = await box.get("musics") as List<DataModel>;
+    dbSongs = box.get("musics") as List<DataModel>;
 
-    dbSongs!.forEach(
+    dbSongs.forEach(
       (element) {
         allSongs.add(
           Audio.file(
@@ -158,7 +149,7 @@ class _AllSongsState extends State<AllSongs> {
                                     margin:
                                         EdgeInsets.only(left: 30, right: 30),
                                     child: Text(
-                                      dbSongs![index].title,
+                                      dbSongs[index].title,
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -181,7 +172,7 @@ class _AllSongsState extends State<AllSongs> {
                                                 top: Radius.circular(20))),
                                         context: context,
                                         builder: (context) =>
-                                            buildSheet(song: dbSongs![index]),
+                                            buildSheet(song: dbSongs[index]),
                                       );
                                     },
                                   ),
@@ -252,7 +243,7 @@ class _AllSongsState extends State<AllSongs> {
                                       height: 6,
                                     ),
                                     Text(
-                                      dbSongs?[index].artist ?? "No Artist",
+                                      dbSongs[index].artist ?? "No Artist",
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.white.withOpacity(0.7),
@@ -374,13 +365,13 @@ class _AllSongsState extends State<AllSongs> {
                             .toList();
 
                         if (existingSongs.isEmpty) {
-                          
                           playlistSongs?.add(song);
                           await box.put(e, playlistSongs!);
 
                           setState(() {});
                           Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBars().songAdded);
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBars().songAdded);
                         } else {
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context)

@@ -23,5 +23,19 @@ class SnackBars {
     ),
     backgroundColor: Colors.grey[900],
   );
+    final likedAdd = SnackBar(
+    content: Text(
+      'Song added to Favorites',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: Colors.grey[900],
+  );
+      final likedRemove = SnackBar(
+    content: Text(
+      'Song removed from Favorites',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: Colors.grey[900],
+  );
   
 }

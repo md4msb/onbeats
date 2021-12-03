@@ -10,7 +10,7 @@ class OpenAssetAudio {
   Future<bool?>setNotifyValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     notify = await prefs.getBool("switchState");
-    print("Check playing screen notify : $notify");
+
     return notify;
   }
 
