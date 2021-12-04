@@ -114,7 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ? searchResult.isNotEmpty
                   ? Expanded(
                       child: ListView.builder(
-                          shrinkWrap: true,
+                          // shrinkWrap: true,
                           physics: BouncingScrollPhysics(),
                           itemCount: searchResult.length,
                           itemBuilder: (context, index) {
