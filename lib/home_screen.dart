@@ -1,9 +1,9 @@
 import 'dart:ui';
-
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/all_songs.dart';
 import 'package:music_app/database/boxes.dart';
+import 'package:music_app/database/data_model.dart';
 import 'package:music_app/library_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -19,25 +19,45 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final box = Boxes.getSongsDb();
   final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
+  final OnAudioQuery audioQuery = OnAudioQuery();
   int index = 0;
 
-  List<dynamic>? dbSongs = [];
+  List<SongModel> songs = [];
+  List<DataModel> mappedSongs = [];
+  List<DataModel> dbSongs = [];
   List<Audio> allSongs = [];
 
   Audio find(List<Audio> source, String fromPath) {
     return source.firstWhere((element) => element.path == fromPath);
   }
 
-  getSongs() {
-    dbSongs = box.get("musics");
-    if(dbSongs == null){
-      dbSongs= [];
-      setState(() {
-        
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    requestPermission();
+  }
 
-    dbSongs!.forEach(
+  requestPermission() async {
+    bool permissionStatus = await audioQuery.permissionsStatus();
+    if (!permissionStatus) {
+      await audioQuery.permissionsRequest();
+    }
+    songs = await audioQuery.querySongs();
+    mappedSongs = songs
+        .map((e) => DataModel(
+              title: e.title,
+              id: e.id,
+              path: e.uri!,
+              duration: e.duration,
+              artist: e.artist,
+            ))
+        .toList();
+
+    await box.put("musics", mappedSongs);
+
+    dbSongs = box.get("musics") as List<DataModel>;
+
+    dbSongs.forEach(
       (element) {
         allSongs.add(
           Audio.file(
@@ -51,11 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    getSongs();
+    // getSongs();
     return Scaffold(
       body: Stack(
         children: [
@@ -104,8 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               myAudio.metas.title!,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.w500,
-                              color: Colors.grey[200],
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[200],
                               ),
                             ),
                             SizedBox(height: 6),
@@ -114,14 +136,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12),
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12),
                             ),
                           ],
                         ),
                       ),
-                      
                     ],
                   )
                       // ListTile(
@@ -215,17 +236,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
-Widget? screens(int index) {
-  switch (index) {
-    case 0:
-      return const AllSongs();
+  Widget? screens(int index) {
+    switch (index) {
+      case 0:
+        return AllSongs(
+          allSongs: allSongs,
+          dbSongs: dbSongs,
+        );
 
-    case 1:
-      return const SearchScreen();
+      case 1:
+        return const SearchScreen();
 
-    case 2:
-      return const LibraryScreen();
+      case 2:
+        return const LibraryScreen();
+    }
   }
 }

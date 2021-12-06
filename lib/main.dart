@@ -15,11 +15,12 @@ void main() async {
   final box = Boxes.getSongsDb();
 
   List<dynamic> libraryKeys = box.keys.toList();
-
+  
   if (!libraryKeys.contains("favorites")) {
     List<dynamic> likedSongs = [];
     await box.put("favorites", likedSongs);
   }
+
 
   runApp(MyApp());
 }

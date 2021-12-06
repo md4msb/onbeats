@@ -10,7 +10,9 @@ import 'dart:ui';
 import 'package:music_app/widgets/snackbars.dart';
 
 class AllSongs extends StatefulWidget {
-  const AllSongs({Key? key}) : super(key: key);
+  List<DataModel> dbSongs = [];
+  List<Audio> allSongs = [];
+  AllSongs({Key? key, required this.dbSongs, required this.allSongs}) : super(key: key);
 
   @override
   _AllSongsState createState() => _AllSongsState();
@@ -24,21 +26,14 @@ class _AllSongsState extends State<AllSongs> {
 
   List<dynamic>? likedSongs = [];
 
-  final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
-
-  final OnAudioQuery audioQuery = OnAudioQuery();
-  final AssetsAudioPlayer audioPlayer = AssetsAudioPlayer.withId("0");
   final box = Boxes.getSongsDb();
 
-  List<SongModel> songs = [];
-  List<DataModel> mappedSongs = [];
-  List<DataModel> dbSongs = [];
-  List<Audio> allSongs = [];
+  final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
+  final OnAudioQuery audioQuery = OnAudioQuery();
 
   @override
   void initState() {
     super.initState();
-    requestPermission();
     controller = TextEditingController();
     likedSongs = box.get("favorites");
   }
@@ -50,43 +45,6 @@ class _AllSongsState extends State<AllSongs> {
     super.dispose();
   }
 
-  requestPermission() async {
-    bool permissionStatus = await audioQuery.permissionsStatus();
-    if (!permissionStatus) {
-      await audioQuery.permissionsRequest();
-    }
-    songs = await audioQuery.querySongs();
-    mappedSongs = songs
-        .map((e) => DataModel(
-              title: e.title,
-              id: e.id,
-              path: e.uri!,
-              duration: e.duration,
-              artist: e.artist,
-            ))
-        .toList();
-
-    await box.put("musics", mappedSongs);
-
-    dbSongs = box.get("musics") as List<DataModel>;
-
-    dbSongs.forEach(
-      (element) {
-        allSongs.add(
-          Audio.file(
-            element.path,
-            metas: Metas(
-              title: element.title,
-              id: element.id.toString(),
-              artist: element.artist,
-            ),
-          ),
-        );
-      },
-    );
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -96,209 +54,214 @@ class _AllSongsState extends State<AllSongs> {
               begin: Alignment.topLeft,
               end: FractionalOffset(0.6, 0.3))),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          elevation: 0,
           backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Settings()),
-                  );
-                },
-                icon: const Icon(
-                  Icons.settings_outlined,
-                ))
-          ],
-        ),
-        body: SafeArea(
-            
-          child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, crossAxisSpacing: 15, mainAxisSpacing: 15),
-                  padding: const EdgeInsets.only(
-                      left: 25, right: 25, bottom: 25, top: 5),
-                  itemCount: allSongs.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        OpenAssetAudio(allSongs: allSongs, index: index).open();
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            title: Text(
+              "Onbeats",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Settings()),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                  ))
+            ],
+          ),
+          body: SafeArea(
+            child: GridView.builder(
+                physics: const BouncingScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15),
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, bottom: 25, top: 5),
+                itemCount: widget.allSongs.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      OpenAssetAudio(allSongs: widget.allSongs, index: index).open();
 
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PlayingScreen(
-                                      songs: allSongs,
-                                    )));
-                      },
-                      onLongPress: () => showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          likedSongs = box.get("favorites");
-                          return Dialog(
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: DialogContainer(
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.only(left: 30, right: 30),
-                                      child: Text(
-                                        dbSongs[index].title,
-                                        textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
-                                      ),
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PlayingScreen(
+                                    songs: widget.allSongs,
+                                  )));
+                    },
+                    onLongPress: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        likedSongs = box.get("favorites");
+                        return Dialog(
+                          backgroundColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: DialogContainer(
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    margin:
+                                        EdgeInsets.only(left: 30, right: 30),
+                                    child: Text(
+                                      widget.dbSongs[index].title,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
                                     ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    ListTile(
-                                      title: Text("Add to Playlist"),
-                                      trailing: Icon(Icons.add),
-                                      onTap: () {
-                                        Navigator.of(context).pop();
-                                        showModalBottomSheet(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.vertical(
-                                                  top: Radius.circular(20))),
-                                          context: context,
-                                          builder: (context) =>
-                                              buildSheet(song: dbSongs[index]),
-                                        );
-                                      },
-                                    ),
-                                    likedSongs!
-                                            .where((element) =>
-                                                element.id.toString() ==
-                                                dbSongs[index].id.toString())
-                                            .isEmpty
-                                        ? ListTile(
-                                            title: Text("Add to Favorites"),
-                                            trailing: Icon(
-                                              Icons.favorite_border_rounded,
-                                              // color: Colors.redAccent,
-                                            ),
-                                            onTap: () async {
-                                              likedSongs?.add(dbSongs[index]);
-                                              await box.put(
-                                                  "favorites", likedSongs!);
+                                  ),
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  ListTile(
+                                    title: Text("Add to Playlist"),
+                                    trailing: Icon(Icons.add),
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                      showModalBottomSheet(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(20))),
+                                        context: context,
+                                        builder: (context) =>
+                                            buildSheet(song: widget.dbSongs[index]),
+                                      );
+                                    },
+                                  ),
+                                  likedSongs!
+                                          .where((element) =>
+                                              element.id.toString() ==
+                                              widget.dbSongs[index].id.toString())
+                                          .isEmpty
+                                      ? ListTile(
+                                          title: Text("Add to Favorites"),
+                                          trailing: Icon(
+                                            Icons.favorite_border_rounded,
+                                            // color: Colors.redAccent,
+                                          ),
+                                          onTap: () async {
+                                            likedSongs?.add(widget.dbSongs[index]);
+                                            await box.put(
+                                                "favorites", likedSongs!);
 
-                                              Navigator.of(context).pop();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                      SnackBars().likedAdd);
-                                            },
-                                          )
-                                        : ListTile(
-                                            title: Text("Remove from Favorites"),
-                                            trailing: Icon(
-                                              Icons.favorite_rounded,
-                                              color: Colors.redAccent,
-                                            ),
-                                            onTap: () async {
-                                              likedSongs?.removeWhere((elemet) =>
-                                                  elemet.id.toString() ==
-                                                  dbSongs[index].id.toString());
-                                              await box.put(
-                                                  "favorites", likedSongs!);
-                                              setState(() {});
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                    SnackBars().likedAdd);
+                                          },
+                                        )
+                                      : ListTile(
+                                          title: Text("Remove from Favorites"),
+                                          trailing: Icon(
+                                            Icons.favorite_rounded,
+                                            color: Colors.redAccent,
+                                          ),
+                                          onTap: () async {
+                                            likedSongs?.removeWhere((elemet) =>
+                                                elemet.id.toString() ==
+                                                widget.dbSongs[index].id.toString());
+                                            await box.put(
+                                                "favorites", likedSongs!);
+                                            setState(() {});
 
-                                              Navigator.of(context).pop();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                      SnackBars().likedRemove);
-                                            },
-                                          )
-                                  ],
-                                ),
+                                            Navigator.of(context).pop();
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                                    SnackBars().likedRemove);
+                                          },
+                                        )
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ),
-                      child: Stack(
-                        clipBehavior: Clip.antiAlias,
-                        children: [
-                          Container(
-                            height: 200,
-                            width: 200,
-                            child: QueryArtworkWidget(
-                              artworkClipBehavior: Clip.antiAlias,
-                              id: int.parse(allSongs[index].metas.id!),
-                              type: ArtworkType.AUDIO,
-                              artworkBorder: BorderRadius.circular(25),
-                              artworkFit: BoxFit.cover,
-                              nullArtworkWidget: Container(
-                                height: 156,
-                                width: 160,
-                                decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/images/default.png"),
-                                    fit: BoxFit.cover,
-                                  ),
+                          ),
+                        );
+                      },
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.antiAlias,
+                      children: [
+                        Container(
+                          height: 200,
+                          width: 200,
+                          child: QueryArtworkWidget(
+                            artworkClipBehavior: Clip.antiAlias,
+                            id: int.parse(widget.allSongs[index].metas.id!),
+                            type: ArtworkType.AUDIO,
+                            artworkBorder: BorderRadius.circular(25),
+                            artworkFit: BoxFit.cover,
+                            nullArtworkWidget: Container(
+                              height: 156,
+                              width: 160,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                image: DecorationImage(
+                                  image:
+                                      AssetImage("assets/images/default.png"),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                           ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Center(
-                              child: Container(
-                                child: FroastedContainer(Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        allSongs[index].metas.title!,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Container(
+                              child: FroastedContainer(Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.allSongs[index].metas.title!,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(
+                                      height: 6,
+                                    ),
+                                    Text(
+                                      widget.dbSongs[index].artist ?? "No Artist",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white.withOpacity(0.7),
                                       ),
-                                      const SizedBox(
-                                        height: 6,
-                                      ),
-                                      Text(
-                                        dbSongs[index].artist ?? "No Artist",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white.withOpacity(0.7),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    ],
-                                  ),
-                                )),
-                              ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  ],
+                                ),
+                              )),
                             ),
-                          )
-                        ],
-                      ),
-                    );
-                  }),
-        )
-              
-      ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }),
+          )),
     );
   }
 
