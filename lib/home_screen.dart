@@ -118,8 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 50,
                                 width: 50,
                                 decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(10),
+                                      topLeft: Radius.circular(10)),
                                   image: DecorationImage(
                                     image:
                                         AssetImage("assets/images/default.png"),
@@ -209,6 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BottomNavigationBar(
           currentIndex: index,
           showSelectedLabels: true,
+          showUnselectedLabels: false,
           unselectedItemColor: Colors.white54,
           selectedItemColor: Colors.white,
           onTap: ((int x) {
