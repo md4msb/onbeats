@@ -63,6 +63,7 @@ class _AllSongsState extends State<AllSongs> {
               "Onbeats",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 21,
               ),
             ),
             actions: [
