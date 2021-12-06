@@ -12,7 +12,8 @@ import 'package:music_app/widgets/snackbars.dart';
 class AllSongs extends StatefulWidget {
   List<DataModel> dbSongs = [];
   List<Audio> allSongs = [];
-  AllSongs({Key? key, required this.dbSongs, required this.allSongs}) : super(key: key);
+  AllSongs({Key? key, required this.dbSongs, required this.allSongs})
+      : super(key: key);
 
   @override
   _AllSongsState createState() => _AllSongsState();
@@ -60,7 +61,9 @@ class _AllSongsState extends State<AllSongs> {
             backgroundColor: Colors.transparent,
             title: Text(
               "Onbeats",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             actions: [
               IconButton(
@@ -88,14 +91,17 @@ class _AllSongsState extends State<AllSongs> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      OpenAssetAudio(allSongs: widget.allSongs, index: index).open();
+                      OpenAssetAudio(allSongs: widget.allSongs, index: index)
+                          .open();
 
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PlayingScreen(
-                                    songs: widget.allSongs,
-                                  )));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayingScreen(
+                            songs: widget.allSongs,
+                          ),
+                        ),
+                      );
                     },
                     onLongPress: () => showDialog(
                       context: context,
@@ -139,15 +145,16 @@ class _AllSongsState extends State<AllSongs> {
                                             borderRadius: BorderRadius.vertical(
                                                 top: Radius.circular(20))),
                                         context: context,
-                                        builder: (context) =>
-                                            buildSheet(song: widget.dbSongs[index]),
+                                        builder: (context) => buildSheet(
+                                            song: widget.dbSongs[index]),
                                       );
                                     },
                                   ),
                                   likedSongs!
                                           .where((element) =>
                                               element.id.toString() ==
-                                              widget.dbSongs[index].id.toString())
+                                              widget.dbSongs[index].id
+                                                  .toString())
                                           .isEmpty
                                       ? ListTile(
                                           title: Text("Add to Favorites"),
@@ -156,7 +163,8 @@ class _AllSongsState extends State<AllSongs> {
                                             // color: Colors.redAccent,
                                           ),
                                           onTap: () async {
-                                            likedSongs?.add(widget.dbSongs[index]);
+                                            likedSongs
+                                                ?.add(widget.dbSongs[index]);
                                             await box.put(
                                                 "favorites", likedSongs!);
 
@@ -175,7 +183,8 @@ class _AllSongsState extends State<AllSongs> {
                                           onTap: () async {
                                             likedSongs?.removeWhere((elemet) =>
                                                 elemet.id.toString() ==
-                                                widget.dbSongs[index].id.toString());
+                                                widget.dbSongs[index].id
+                                                    .toString());
                                             await box.put(
                                                 "favorites", likedSongs!);
                                             setState(() {});
@@ -243,7 +252,8 @@ class _AllSongsState extends State<AllSongs> {
                                       height: 6,
                                     ),
                                     Text(
-                                      widget.dbSongs[index].artist ?? "No Artist",
+                                      widget.dbSongs[index].artist ??
+                                          "No Artist",
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.white.withOpacity(0.7),

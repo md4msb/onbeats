@@ -34,7 +34,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   void initState() {
     super.initState();
     controller = TextEditingController();
-    
+
     playlists = box.keys.toList();
   }
 
@@ -107,7 +107,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     TextButton(
                         onPressed: () {
                           submit();
-                          
                         },
                         child: Text(
                           "CREATE",
@@ -146,35 +145,53 @@ class _LibraryScreenState extends State<LibraryScreen> {
               leadSize: 23,
               leadClr: Colors.pink[400],
               tail: Icons.arrow_forward_ios),
-
-                        ...playlists
-              .map((e) => e != "musics" && e!= "favorites"
+          ...playlists
+              .map((e) => e != "musics" && e != "favorites"
                   ? libraryList(
                       child: ListTile(
-                        onTap: (){
-                          Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  PlaylistScreen(playlistName: e,)),
-                  );
-                        },
-                    leading: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image:
-                                AssetImage("assets/images/searchpre.jpg"),
-                            fit: BoxFit.cover),
-                        borderRadius: BorderRadius.all(Radius.circular(17)),
-                      ),
-                    ),
-                    title: Text(
-                      e.toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ))
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlaylistScreen(
+                                        playlistName: e,
+                                      )),
+                            );
+                          },
+                          leading: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image:
+                                      AssetImage("assets/images/searchpre.jpg"),
+                                  fit: BoxFit.cover),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(17)),
+                            ),
+                          ),
+                          title: Text(
+                            e.toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          trailing: PopupMenuButton(
+                              itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      child: Text("Delete Playlist"),
+                                      value: "0",
+                                    ),
+                                  ],
+                              onSelected: (value) {
+                                if (value == "0") {
+                                  box.delete(e);
+                                  setState(() {
+                                    playlists = box.keys.toList();
+                                  });
+                                }
+                              })),
+                    )
                   : Container())
               .toList()
         ],
@@ -229,7 +246,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   void submit() {
     playlistName = controller.text;
-    
 
     List? excistingName = [];
     if (playlists.length > 0) {

@@ -3,6 +3,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
+import 'package:music_app/library_screen.dart';
 import 'package:music_app/widgets/snackbars.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -50,271 +51,279 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.keyboard_arrow_down_sharp,
-              size: 38,
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.keyboard_arrow_down_sharp,
+                size: 38,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: const Text(
-            "Now Playing",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+            title: const Text(
+              "Now Playing",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        body: assetAudioPlayer.builderCurrent(
-            builder: (context, Playing? playing) {
-          final myAudio = find(widget.songs, playing!.audio.assetAudioPath);
+          body: assetAudioPlayer.builderCurrent(
+              builder: (context, Playing? playing) {
+            final myAudio = find(widget.songs, playing!.audio.assetAudioPath);
 
-          final currentSong = dbSongs.firstWhere((element) =>
-              element.id.toString() == myAudio.metas.id.toString());
+            final currentSong = dbSongs.firstWhere((element) =>
+                element.id.toString() == myAudio.metas.id.toString());
 
-          likedSongs = box.get("favorites");
+            likedSongs = box.get("favorites");
 
-          return Center(
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //!----------------------------
-                //!<<<album art of the song.>>>
-                //!----------------------------
+            return Center(
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //!----------------------------
+                  //!<<<album art of the song.>>>
+                  //!----------------------------
 
-                const SizedBox(
-                  height: 60,
-                ),
+                  const SizedBox(
+                    height: 60,
+                  ),
 
-                SizedBox(
-                  height: 310,
-                  width: 310,
-                  child: QueryArtworkWidget(
-                    id: int.parse(myAudio.metas.id!),
-                    type: ArtworkType.AUDIO,
-                    artworkBorder: BorderRadius.circular(20),
-                    artworkFit: BoxFit.cover,
-                    nullArtworkWidget: Container(
-                      height: 310,
-                      width: 310,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        image: DecorationImage(
-                          image: AssetImage("assets/images/default.png"),
-                          fit: BoxFit.cover,
+                  SizedBox(
+                    height: 310,
+                    width: 310,
+                    child: QueryArtworkWidget(
+                      id: int.parse(myAudio.metas.id!),
+                      type: ArtworkType.AUDIO,
+                      artworkBorder: BorderRadius.circular(20),
+                      artworkFit: BoxFit.cover,
+                      nullArtworkWidget: Container(
+                        height: 310,
+                        width: 310,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/default.png"),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
+                  const SizedBox(
+                    height: 50,
+                  ),
 
-                //!----------------------------
-                //!<<<title of the song.>>>
-                //!----------------------------
+                  //!----------------------------
+                  //!<<<title of the song.>>>
+                  //!----------------------------
 
-                Container(
-                  margin: const EdgeInsets.only(right: 70, left: 70),
-                  child: Column(
+                  Container(
+                    margin: const EdgeInsets.only(right: 70, left: 70),
+                    child: Column(
+                      children: [
+                        Text(
+                          myAudio.metas.title!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        Text(
+                          myAudio.metas.artist ?? "No Artist",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  //!------------------------------------------
+                  //!<<<Progress bar.>>>
+                  //!------------------------------------------
+
+                  const SizedBox(
+                    height: 40,
+                  ),
+
+                  assetAudioPlayer.builderRealtimePlayingInfos(
+                      builder: (context, RealtimePlayingInfos? infos) {
+                    if (infos == null) {
+                      return SizedBox();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 40, right: 40),
+                      child: ProgressBar(
+                        timeLabelPadding: 10,
+                        thumbRadius: 0,
+                        baseBarColor: Colors.grey[500],
+                        progressBarColor: Colors.purple[700],
+                        thumbGlowRadius: 8,
+                        thumbGlowColor: Colors.purple[400],
+                        barHeight: 4,
+                        progress: infos.currentPosition,
+                        total: infos.duration,
+                        onSeek: (duration) {
+                          assetAudioPlayer.seek(duration);
+                        },
+                      ),
+                    );
+                  }),
+
+                  //!------------------------------------------
+                  //!<<<song action buttons>>>
+                  //!------------------------------------------
+
+                  const SizedBox(
+                    height: 5,
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        myAudio.metas.title!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                      IconButton(
+                        icon: const Icon(
+                          Icons.skip_previous_rounded,
+                          size: 28,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        onPressed: () {
+                          assetAudioPlayer.previous();
+                        },
                       ),
-                      const SizedBox(
-                        height: 13,
+                      SizedBox(
+                        width: 30,
                       ),
-                      Text(
-                        myAudio.metas.artist ?? "No Artist",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey,
+                      PlayerBuilder.isPlaying(
+                          player: assetAudioPlayer,
+                          builder: (context, isPlaying) {
+                            return IconButton(
+                                onPressed: () async {
+                                  await assetAudioPlayer.playOrPause();
+                                },
+                                icon: Icon(
+                                  isPlaying
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                  size: 34,
+                                ));
+                          }),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.skip_next_rounded,
+                          size: 28,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        onPressed: () {
+                          assetAudioPlayer.next();
+                        },
                       ),
                     ],
                   ),
-                ),
 
-                //!------------------------------------------
-                //!<<<Progress bar.>>>
-                //!------------------------------------------
+                  //!------------------------------------------
+                  //!<<<bottom section>>>
+                  //!------------------------------------------
 
-                const SizedBox(
-                  height: 30,
-                ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        height: 80,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: const BoxDecoration(
+                            color: Colors.white12,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                topRight: Radius.circular(25))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            likedSongs!
+                                    .where((element) =>
+                                        element.id.toString() ==
+                                        currentSong.id.toString())
+                                    .isEmpty
+                                ? IconButton(
+                                    onPressed: () async {
+                                      likedSongs?.add(currentSong);
+                                      await box.put("favorites", likedSongs!);
 
-                assetAudioPlayer.builderRealtimePlayingInfos(
-                    builder: (context, RealtimePlayingInfos? infos) {
-                  if (infos == null) {
-                    return SizedBox();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: ProgressBar(
-                      timeLabelPadding: 10,
-                      thumbRadius: 0,
-                      baseBarColor: Colors.grey[500],
-                      progressBarColor: Colors.purple[700],
-                      thumbGlowRadius: 8,
-                      thumbGlowColor: Colors.purple[400],
-                      barHeight: 4,
-                      progress: infos.currentPosition,
-                      total: infos.duration,
-                      onSeek: (duration) {
-                        assetAudioPlayer.seek(duration);
-                      },
-                    ),
-                  );
-                }),
-
-                //!------------------------------------------
-                //!<<<song action buttons>>>
-                //!------------------------------------------
-
-                const SizedBox(
-                  height: 5,
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.skip_previous_rounded,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        assetAudioPlayer.previous();
-                      },
-                    ),
-                    SizedBox(
-                      width: 25,
-                    ),
-                    PlayerBuilder.isPlaying(
-                        player: assetAudioPlayer,
-                        builder: (context, isPlaying) {
-                          return IconButton(
-                              onPressed: () async {
-                                await assetAudioPlayer.playOrPause();
-                              },
-                              icon: Icon(
-                                isPlaying
-                                    ? Icons.pause_rounded
-                                    : Icons.play_arrow_rounded,
-                                size: 32,
-                              ));
-                        }),
-                    SizedBox(
-                      width: 25,
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.skip_next_rounded,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        assetAudioPlayer.next();
-                      },
-                    ),
-                  ],
-                ),
-
-                //!------------------------------------------
-                //!<<<bottom section>>>
-                //!------------------------------------------
-
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      height: 80,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                          color: Colors.white12,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(25),
-                              topRight: Radius.circular(25))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          likedSongs!
-                                  .where((element) =>
-                                      element.id.toString() ==
-                                      currentSong.id.toString())
-                                  .isEmpty
-                              ? IconButton(
-                                  onPressed: () async {
-                                    likedSongs?.add(currentSong);
-                                    await box.put("favorites", likedSongs!);
-
-                                    setState(() {});
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite_border_rounded,
-                                    size: 30,
-                                  ))
-                              : IconButton(
-                                  onPressed: () async {
-                                    likedSongs?.removeWhere((elemet) =>
-                                        elemet.id.toString() ==
-                                        currentSong.id.toString());
-                                    await box.put("favorites", likedSongs!);
-                                    setState(() {});
-                                  },
-                                  icon: Icon(
-                                    Icons.favorite_rounded,
-                                    color: Colors.redAccent,
-                                    size: 30,
-                                  )),
-                          IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20))),
-                                    context: context,
-                                    builder: (context) {
-                                      print(currentSong.title);
-                                      return buildSheet(song: currentSong);
-                                    });
-                              },
-                              icon: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 30,
-                              )),
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.reorder,
-                                color: Colors.white,
-                                size: 30,
-                              )),
-                        ],
+                                      setState(() {});
+                                    },
+                                    icon: Icon(
+                                      Icons.favorite_border_rounded,
+                                      size: 30,
+                                    ))
+                                : IconButton(
+                                    onPressed: () async {
+                                      likedSongs?.removeWhere((elemet) =>
+                                          elemet.id.toString() ==
+                                          currentSong.id.toString());
+                                      await box.put("favorites", likedSongs!);
+                                      setState(() {});
+                                    },
+                                    icon: Icon(
+                                      Icons.favorite_rounded,
+                                      color: Colors.redAccent,
+                                      size: 30,
+                                    )),
+                            IconButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20))),
+                                      context: context,
+                                      builder: (context) {
+                                        print(currentSong.title);
+                                        return buildSheet(song: currentSong);
+                                      });
+                                },
+                                icon: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 30,
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      (context),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LibraryScreen()));
+                                },
+                                icon: const Icon(
+                                  Icons.playlist_play_rounded,
+                                  color: Colors.white,
+                                  size: 30,
+                                )),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }));
+                ],
+              ),
+            );
+          })),
+    );
   }
 
   Widget buildSheet({required song}) {

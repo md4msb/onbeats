@@ -5,6 +5,7 @@ import 'package:music_app/all_songs.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
 import 'package:music_app/library_screen.dart';
+import 'package:music_app/playing_song.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 import 'search_screen.dart';
@@ -76,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // getSongs();
     return Scaffold(
       body: Stack(
         children: [
@@ -88,99 +88,114 @@ class _HomeScreenState extends State<HomeScreen> {
               return Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  margin: EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-                  child: FroastedContainer(Row(
-                    children: [
-                      Container(
-                        height: 60,
-                        width: 60,
-                        child: QueryArtworkWidget(
-                          id: int.parse(myAudio.metas.id!),
-                          type: ArtworkType.AUDIO,
-                          artworkBorder: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              topLeft: Radius.circular(10)),
-                          artworkFit: BoxFit.cover,
-                          nullArtworkWidget: Container(
-                            height: 50,
-                            width: 50,
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              image: DecorationImage(
-                                image: AssetImage("assets/images/default.png"),
-                                fit: BoxFit.cover,
+                  margin:
+                      EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayingScreen(
+                            songs: allSongs,
+                          ),
+                        ),
+                      );
+                    },
+                    child: FroastedContainer(
+                      Row(
+                        children: [
+                          Container(
+                            height: 60,
+                            width: 60,
+                            child: QueryArtworkWidget(
+                              id: int.parse(myAudio.metas.id!),
+                              type: ArtworkType.AUDIO,
+                              artworkBorder: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  topLeft: Radius.circular(10)),
+                              artworkFit: BoxFit.cover,
+                              nullArtworkWidget: Container(
+                                height: 50,
+                                width: 50,
+                                decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage("assets/images/default.png"),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          // mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              myAudio.metas.title!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[200],
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 12,
+                                top: 12,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    myAudio.metas.title!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey[100],
+                                    ),
+                                  ),
+                                  SizedBox(height: 7),
+                                  Text(
+                                    myAudio.metas.artist!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(height: 6),
-                            Text(
-                              myAudio.metas.artist!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12),
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(width: 20),
+                          Row(
+                            children: [
+                              PlayerBuilder.isPlaying(
+                                  player: assetAudioPlayer,
+                                  builder: (context, isPlaying) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        await assetAudioPlayer.playOrPause();
+                                      },
+                                      child: Icon(
+                                        isPlaying
+                                            ? Icons.pause_rounded
+                                            : Icons.play_arrow_rounded,
+                                        size: 28,
+                                      ),
+                                    );
+                                  }),
+                              SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  assetAudioPlayer.next();
+                                },
+                                child: Icon(
+                                  Icons.skip_next_rounded,
+                                  size: 28,
+                                ),
+                              ),
+                              SizedBox(width: 15),
+                            ],
+                          )
+                        ],
                       ),
-                    ],
-                  )
-                      // ListTile(
-                      //   leading: Container(
-                      // height: 50,
-                      // width: 50,
-                      // child: QueryArtworkWidget(
-                      //   id: int.parse(myAudio.metas.id!),
-                      //   type: ArtworkType.AUDIO,
-                      //   artworkBorder: BorderRadius.circular(15),
-                      //   artworkFit: BoxFit.cover,
-                      //   nullArtworkWidget: Container(
-                      //     height: 50,
-                      //     width: 50,
-                      //     decoration: const BoxDecoration(
-                      //       borderRadius:
-                      //           BorderRadius.all(Radius.circular(15)),
-                      //       image: DecorationImage(
-                      //         image: AssetImage("assets/images/default.png"),
-                      //         fit: BoxFit.cover,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      //   ),
-                      //   title: Text(
-                      // myAudio.metas.title!,
-                      // maxLines: 1,
-                      // overflow: TextOverflow.ellipsis,
-                      // style: TextStyle(fontWeight: FontWeight.w500),
-                      //   ),
-                      //   subtitle: Text(
-                      // myAudio.metas.artist!,
-                      // maxLines: 1,
-                      // overflow: TextOverflow.ellipsis,
-                      //   ),
-                      // ),
-                      ),
+                    ),
+                  ),
                 ),
               );
             }),
@@ -222,6 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget FroastedContainer(Widget child) {
     return ClipRRect(
+      borderRadius: BorderRadius.circular(11),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(

@@ -23,6 +23,7 @@ class OpenAssetAudio {
       Playlist(audios: allSongs, startIndex: index),
       showNotification: notify == null || notify == true ? true : false,      
       autoStart: true,
+      
     );
   }
 }
