@@ -208,33 +208,36 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Padding(
       padding: const EdgeInsets.only(left: 5, right: 5, bottom: 15),
       child: ListTile(
-        onTap: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Favorites())),
-        leading: Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-            color: leadClr,
-            borderRadius: BorderRadius.all(Radius.circular(17)),
+          onTap: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Favorites())),
+          leading: Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: leadClr,
+              borderRadius: BorderRadius.all(Radius.circular(17)),
+            ),
+            child: Center(
+                child: Icon(
+              leadIcon,
+              color: Colors.white,
+              size: leadSize,
+            )),
           ),
-          child: Center(
-              child: Icon(
-            leadIcon,
-            color: Colors.white,
-            size: leadSize,
+          title: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          trailing: IconButton(
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Favorites())),
+            icon: Icon(
+              tail,
+              size: 20,
+            ),
           )),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        trailing: Icon(
-          tail,
-          size: 20,
-        ),
-      ),
     );
   }
 
