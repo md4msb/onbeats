@@ -11,8 +11,8 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   bool notify = true;
 
-  final snackBartrue = SnackBar(content: Text('Notification turned on!',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
-  final snackBarfalse = SnackBar(content: Text('Notification turned off!',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
+  
+  final snackBarNotify = SnackBar(content: Text('App need to restart to change the settings',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
 
   @override
   void initState() {
@@ -125,10 +125,10 @@ class _SettingsState extends State<Settings> {
 
                                       if (notify == null || notify == true) {
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBartrue);
+                                            .showSnackBar(snackBarNotify);
                                       } else {
                                         ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBarfalse);
+                                            .showSnackBar(snackBarNotify);
                                       }
                                     });
                                     print(notify);
