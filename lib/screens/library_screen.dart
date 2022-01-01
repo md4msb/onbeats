@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:music_app/favorites.dart';
-import 'package:music_app/playlist_screen.dart';
-import 'database/boxes.dart';
-import 'database/data_model.dart';
+import 'package:music_app/screens/favorites.dart';
+import 'package:music_app/screens/playlist_screen.dart';
+import '../database/boxes.dart';
+import '../database/data_model.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({Key? key}) : super(key: key);
@@ -16,7 +16,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   late TextEditingController controller;
 
   final excistingPlaylist = SnackBar(
-    content: Text(
+    content: const Text(
       'Excisting playlist name',
       style: TextStyle(color: Colors.white),
     ),
@@ -92,7 +92,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(
+                  title: const Text(
                     "Give your playlist a name",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
@@ -120,18 +120,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
               leading: Container(
                 height: 50,
                 width: 50,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF606060),
                   borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
-                child: Center(
+                child: const Center(
                     child: Icon(
                   Icons.add,
                   color: Colors.white,
                   size: 28,
                 )),
               ),
-              title: Text(
+              title: const Text(
                 "Create Playlist",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           leading: Container(
                             height: 50,
                             width: 50,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               image: DecorationImage(
                                   image:
                                       AssetImage("assets/images/searchpre.jpg"),
@@ -172,13 +172,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           ),
                           title: Text(
                             e.toString(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           trailing: PopupMenuButton(
                               itemBuilder: (context) => [
-                                    PopupMenuItem(
+                                    const PopupMenuItem(
                                       child: Text("Delete Playlist"),
                                       value: "0",
                                     ),
@@ -209,13 +209,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
       padding: const EdgeInsets.only(left: 5, right: 5, bottom: 15),
       child: ListTile(
           onTap: () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Favorites())),
+              context, MaterialPageRoute(builder: (context) => const Favorites())),
           leading: Container(
             height: 50,
             width: 50,
             decoration: BoxDecoration(
               color: leadClr,
-              borderRadius: BorderRadius.all(Radius.circular(17)),
+              borderRadius: const BorderRadius.all(Radius.circular(17)),
             ),
             child: Center(
                 child: Icon(
@@ -226,13 +226,13 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
           title: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
           trailing: IconButton(
             onPressed: () => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Favorites())),
+                context, MaterialPageRoute(builder: (context) => const Favorites())),
             icon: Icon(
               tail,
               size: 20,
@@ -251,12 +251,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
     playlistName = controller.text;
 
     List? excistingName = [];
-    if (playlists.length > 0) {
+    if (playlists.isNotEmpty) {
       excistingName =
           playlists.where((element) => element == playlistName).toList();
     }
 
-    if (playlistName != '' && excistingName.length == 0) {
+    if (playlistName != '' && excistingName.isEmpty) {
       box.put(playlistName, library);
       Navigator.of(context).pop();
       setState(() {

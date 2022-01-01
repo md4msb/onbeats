@@ -1,11 +1,11 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
-import 'package:music_app/playing_song.dart';
+import 'package:music_app/screens/playing_song.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
-import 'database/data_model.dart';
-import 'open_assetaudio.dart';
+import '../database/data_model.dart';
+import '../open_assetaudio.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -29,14 +29,14 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<String> debounce() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     return "Waited 1";
   }
 
   getSongs() {
     dbSongs = box.get("musics") as List<DataModel>;
 
-    dbSongs.forEach((element) {
+    for (var element in dbSongs) {
       allSongs.add(
         Audio.file(
           element.path,
@@ -46,7 +46,7 @@ class _SearchScreenState extends State<SearchScreen> {
               artist: element.artist),
         ),
       );
-    });
+    }
   }
 
   @override
@@ -115,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ? Expanded(
                       child: ListView.builder(
                           // shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
+                          physics: const BouncingScrollPhysics(),
                           itemCount: searchResult.length,
                           itemBuilder: (context, index) {
                             return FutureBuilder(
@@ -139,7 +139,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                                     )));
                                       },
                                       child: ListTile(
-                                        leading: Container(
+                                        leading: SizedBox(
                                           height: 50,
                                           width: 50,
                                           child: QueryArtworkWidget(
@@ -168,7 +168,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                           searchResult[index].metas.title!,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w500),
                                         ),
                                         subtitle: Text(
@@ -183,7 +183,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 });
                           }),
                     )
-                  : Padding(
+                  : const Padding(
                       padding: EdgeInsets.all(30),
                       child: Text(
                         "No result found",
@@ -193,7 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                     )
-              : SizedBox()
+              : const SizedBox()
         ],
       ),
     );
@@ -212,16 +212,16 @@ class _SearchScreenState extends State<SearchScreen> {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            image: DecorationImage(
+            image: const DecorationImage(
                 image: AssetImage("assets/images/searchpre.jpg"),
                 fit: BoxFit.cover),
             color: leadClr,
-            borderRadius: BorderRadius.all(Radius.circular(17)),
+            borderRadius: const BorderRadius.all(Radius.circular(17)),
           ),
         ),
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),

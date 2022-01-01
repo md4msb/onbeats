@@ -3,10 +3,11 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
-import 'package:music_app/library_screen.dart';
+import 'package:music_app/screens/library_screen.dart';
 import 'package:music_app/widgets/snackbars.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
+// ignore: must_be_immutable
 class PlayingScreen extends StatefulWidget {
   List<Audio> songs;
 
@@ -164,7 +165,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                   assetAudioPlayer.builderRealtimePlayingInfos(
                       builder: (context, RealtimePlayingInfos? infos) {
                     if (infos == null) {
-                      return SizedBox();
+                      return const SizedBox();
                     }
                     return Padding(
                       padding: const EdgeInsets.only(left: 40, right: 40),
@@ -205,7 +206,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                           assetAudioPlayer.previous();
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 30,
                       ),
                       PlayerBuilder.isPlaying(
@@ -222,7 +223,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                   size: 34,
                                 ));
                           }),
-                      SizedBox(
+                      const SizedBox(
                         width: 30,
                       ),
                       IconButton(
@@ -267,7 +268,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
                                       setState(() {});
                                     },
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.favorite_border_rounded,
                                       size: 30,
                                     ))
@@ -279,7 +280,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                       await box.put("favorites", likedSongs!);
                                       setState(() {});
                                     },
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.favorite_rounded,
                                       color: Colors.redAccent,
                                       size: 30,
@@ -287,12 +288,12 @@ class _PlayingScreenState extends State<PlayingScreen> {
                             IconButton(
                                 onPressed: () {
                                   showModalBottomSheet(
-                                      shape: RoundedRectangleBorder(
+                                      shape: const RoundedRectangleBorder(
                                           borderRadius: BorderRadius.vertical(
                                               top: Radius.circular(20))),
                                       context: context,
                                       builder: (context) {
-                                        print(currentSong.title);
+                                        
                                         return buildSheet(song: currentSong);
                                       });
                                 },
@@ -307,7 +308,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                       (context),
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              LibraryScreen()));
+                                              const LibraryScreen()));
                                 },
                                 icon: const Icon(
                                   Icons.playlist_play_rounded,
@@ -329,7 +330,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
   Widget buildSheet({required song}) {
     playlists = box.keys.toList();
     return Container(
-      padding: EdgeInsets.only(top: 20, bottom: 20),
+      padding: const EdgeInsets.only(top: 20, bottom: 20),
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
@@ -338,7 +339,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(
+                  title: const Text(
                     "Give your playlist a name",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
@@ -364,18 +365,18 @@ class _PlayingScreenState extends State<PlayingScreen> {
               leading: Container(
                 height: 50,
                 width: 50,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF606060),
                   borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
-                child: Center(
+                child: const Center(
                     child: Icon(
                   Icons.add,
                   color: Colors.white,
                   size: 28,
                 )),
               ),
-              title: Text(
+              title: const Text(
                 "Create Playlist",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -412,7 +413,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       leading: Container(
                         height: 50,
                         width: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
                               image: AssetImage("assets/images/searchpre.jpg"),
                               fit: BoxFit.cover),
@@ -421,7 +422,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       ),
                       title: Text(
                         e.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -443,12 +444,12 @@ class _PlayingScreenState extends State<PlayingScreen> {
     playlistName = controller.text;
 
     List? excistingName = [];
-    if (playlists.length > 0) {
+    if (playlists.isNotEmpty) {
       excistingName =
           playlists.where((element) => element == playlistName).toList();
     }
 
-    if (playlistName != '' && excistingName.length == 0) {
+    if (playlistName != '' && excistingName.isEmpty) {
       await box.put(playlistName, playlistSongs!);
       Navigator.of(context).pop();
       setState(() {});

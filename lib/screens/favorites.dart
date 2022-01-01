@@ -2,10 +2,10 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:music_app/database/boxes.dart';
-import 'package:music_app/playing_song.dart';
+import 'package:music_app/screens/playing_song.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
-import 'open_assetaudio.dart';
+import '../open_assetaudio.dart';
 
 class Favorites extends StatefulWidget {
   const Favorites({Key? key}) : super(key: key);
@@ -33,8 +33,8 @@ class _FavoritesState extends State<Favorites> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 12),
+          const Padding(
+            padding: EdgeInsets.only(left: 20, right: 12),
             child: Text(
               "Liked Songs",
               style: TextStyle(
@@ -43,7 +43,7 @@ class _FavoritesState extends State<Favorites> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Expanded(
@@ -55,7 +55,7 @@ class _FavoritesState extends State<Favorites> {
                         itemCount: likedSongs.length,
                         itemBuilder: (context, index) => GestureDetector(
                               onTap: () {
-                                likedSongs.forEach((element) {
+                                for (var element in likedSongs) {
                                   playLiked.add(
                                     Audio.file(
                                       element.path,
@@ -66,7 +66,7 @@ class _FavoritesState extends State<Favorites> {
                                       ),
                                     ),
                                   );
-                                });
+                                }
                                 OpenAssetAudio(
                                         allSongs: playLiked, index: index)
                                     .open();
@@ -79,7 +79,7 @@ class _FavoritesState extends State<Favorites> {
                                             )));
                               },
                               child: ListTile(
-                                leading: Container(
+                                leading: SizedBox(
                                   height: 50,
                                   width: 50,
                                   child: QueryArtworkWidget(
@@ -106,7 +106,7 @@ class _FavoritesState extends State<Favorites> {
                                   likedSongs[index].title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
                                 ),
                                 subtitle: Text(
                                   likedSongs[index].artist,
@@ -133,11 +133,11 @@ class _FavoritesState extends State<Favorites> {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            image: DecorationImage(
+            image: const DecorationImage(
                 image: AssetImage("assets/images/searchpre.jpg"),
                 fit: BoxFit.cover),
             color: leadClr,
-            borderRadius: BorderRadius.all(Radius.circular(17)),
+            borderRadius: const BorderRadius.all(Radius.circular(17)),
           ),
           child: Center(
               child: Icon(
@@ -148,11 +148,11 @@ class _FavoritesState extends State<Favorites> {
         ),
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
-        trailing: Icon(
+        trailing: const Icon(
           Icons.play_arrow_rounded,
           size: 30,
         ),

@@ -2,13 +2,15 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
-import 'package:music_app/playing_song.dart';
-import 'package:music_app/settings_screen.dart';
+import 'package:music_app/screens/playing_song.dart';
+import 'package:music_app/screens/settings_screen.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-import 'open_assetaudio.dart';
+import '../open_assetaudio.dart';
 import 'dart:ui';
 import 'package:music_app/widgets/snackbars.dart';
 
+
+// ignore: must_be_immutable
 class AllSongs extends StatefulWidget {
   List<DataModel> dbSongs = [];
   List<Audio> allSongs = [];
@@ -59,7 +61,7 @@ class _AllSongsState extends State<AllSongs> {
           appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
-            title: Text(
+            title: const Text(
               "Onbeats",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -113,7 +115,7 @@ class _AllSongsState extends State<AllSongs> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100),
                           ),
-                          child: DialogContainer(
+                          child: dialogContainer(
                             Padding(
                               padding: const EdgeInsets.all(12.0),
                               child: Column(
@@ -122,27 +124,27 @@ class _AllSongsState extends State<AllSongs> {
                                 children: [
                                   Container(
                                     margin:
-                                        EdgeInsets.only(left: 30, right: 30),
+                                        const EdgeInsets.only(left: 30, right: 30),
                                     child: Text(
                                       widget.dbSongs[index].title,
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 12,
                                   ),
                                   ListTile(
-                                    title: Text("Add to Playlist"),
-                                    trailing: Icon(Icons.add),
+                                    title: const Text("Add to Playlist"),
+                                    trailing: const Icon(Icons.add),
                                     onTap: () {
                                       Navigator.of(context).pop();
                                       showModalBottomSheet(
-                                        shape: RoundedRectangleBorder(
+                                        shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.vertical(
                                                 top: Radius.circular(20))),
                                         context: context,
@@ -158,8 +160,8 @@ class _AllSongsState extends State<AllSongs> {
                                                   .toString())
                                           .isEmpty
                                       ? ListTile(
-                                          title: Text("Add to Favorites"),
-                                          trailing: Icon(
+                                          title: const Text("Add to Favorites"),
+                                          trailing: const Icon(
                                             Icons.favorite_border_rounded,
                                             // color: Colors.redAccent,
                                           ),
@@ -176,8 +178,8 @@ class _AllSongsState extends State<AllSongs> {
                                           },
                                         )
                                       : ListTile(
-                                          title: Text("Remove from Favorites"),
-                                          trailing: Icon(
+                                          title: const Text("Remove from Favorites"),
+                                          trailing: const Icon(
                                             Icons.favorite_rounded,
                                             color: Colors.redAccent,
                                           ),
@@ -206,7 +208,7 @@ class _AllSongsState extends State<AllSongs> {
                     child: Stack(
                       clipBehavior: Clip.antiAlias,
                       children: [
-                        Container(
+                        SizedBox(
                           height: 200,
                           width: 200,
                           child: QueryArtworkWidget(
@@ -236,7 +238,7 @@ class _AllSongsState extends State<AllSongs> {
                           right: 0,
                           child: Center(
                             child: Container(
-                              child: FroastedContainer(Padding(
+                              child: froastedContainer(Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +278,7 @@ class _AllSongsState extends State<AllSongs> {
     );
   }
 
-  Widget FroastedContainer(Widget child) {
+  Widget froastedContainer(Widget child) {
     return ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(15)),
       child: BackdropFilter(
@@ -291,7 +293,7 @@ class _AllSongsState extends State<AllSongs> {
     );
   }
 
-  Widget DialogContainer(Widget child) {
+  Widget dialogContainer(Widget child) {
     return ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(15)),
       child: BackdropFilter(
@@ -307,7 +309,7 @@ class _AllSongsState extends State<AllSongs> {
   Widget buildSheet({required song}) {
     playlists = box.keys.toList();
     return Container(
-      padding: EdgeInsets.only(top: 20, bottom: 20),
+      padding: const EdgeInsets.only(top: 20, bottom: 20),
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
@@ -316,7 +318,7 @@ class _AllSongsState extends State<AllSongs> {
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(
+                  title: const Text(
                     "Give your playlist a name",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
@@ -342,18 +344,18 @@ class _AllSongsState extends State<AllSongs> {
               leading: Container(
                 height: 50,
                 width: 50,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF606060),
                   borderRadius: BorderRadius.all(Radius.circular(17)),
                 ),
-                child: Center(
+                child: const Center(
                     child: Icon(
                   Icons.add,
                   color: Colors.white,
                   size: 28,
                 )),
               ),
-              title: Text(
+              title: const Text(
                 "Create Playlist",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -390,7 +392,7 @@ class _AllSongsState extends State<AllSongs> {
                       leading: Container(
                         height: 50,
                         width: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           image: DecorationImage(
                               image: AssetImage("assets/images/searchpre.jpg"),
                               fit: BoxFit.cover),
@@ -399,7 +401,7 @@ class _AllSongsState extends State<AllSongs> {
                       ),
                       title: Text(
                         e.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -421,12 +423,12 @@ class _AllSongsState extends State<AllSongs> {
     playlistName = controller.text;
 
     List? excistingName = [];
-    if (playlists.length > 0) {
+    if (playlists.isNotEmpty) {
       excistingName =
           playlists.where((element) => element == playlistName).toList();
     }
 
-    if (playlistName != '' && excistingName.length == 0) {
+    if (playlistName != '' && excistingName.isEmpty) {
       await box.put(playlistName, playlistSongs!);
       Navigator.of(context).pop();
       setState(() {});

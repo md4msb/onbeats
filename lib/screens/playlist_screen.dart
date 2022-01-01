@@ -1,13 +1,14 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/open_assetaudio.dart';
-import 'package:music_app/playing_song.dart';
+import 'package:music_app/screens/playing_song.dart';
 import 'package:music_app/widgets/playlist_bottomsheet.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'database/boxes.dart';
-import 'database/data_model.dart';
+import '../database/boxes.dart';
+import '../database/data_model.dart';
 
+// ignore: must_be_immutable
 class PlaylistScreen extends StatefulWidget {
   String playlistName;
 
@@ -56,20 +57,20 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             padding: const EdgeInsets.only(left: 20, right: 12),
             child: Text(
               widget.playlistName,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 26,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Center(
             child: ElevatedButton(
               onPressed: () {
                 showModalBottomSheet(
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(20))),
                     context: context,
@@ -90,7 +91,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       borderRadius: BorderRadius.circular(50))),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 35,
           ),
           Expanded(
@@ -99,12 +100,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 builder: (context, Box boxes, _) {
                   List<dynamic> playlistSongs = boxes.get(widget.playlistName);
                   return ListView.builder(
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     itemCount: playlistSongs.length,
                     itemBuilder: (context, index) => GestureDetector(
                       onTap: () {
-                        playlistSongs.forEach(
-                          (element) {
+                        for (var element in playlistSongs) {
                             playPlaylist.add(
                               Audio.file(
                                 element.path,
@@ -115,8 +115,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                 ),
                               ),
                             );
-                          },
-                        );
+                          }
                         OpenAssetAudio(allSongs: playPlaylist, index: index)
                             .open();
 
@@ -128,7 +127,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                     )));
                       },
                       child: ListTile(
-                        leading: Container(
+                        leading: SizedBox(
                           height: 50,
                           width: 50,
                           child: QueryArtworkWidget(
@@ -155,7 +154,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           playlistSongs[index].title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.w500),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                         subtitle: Text(
                           playlistSongs[index].artist,

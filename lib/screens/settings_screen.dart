@@ -12,7 +12,7 @@ class _SettingsState extends State<Settings> {
   bool notify = true;
 
   
-  final snackBarNotify = SnackBar(content: Text('App need to restart to change the settings',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
+  final snackBarNotify = SnackBar(content: const Text('App need to restart to change the settings',style: TextStyle(color: Colors.white),),backgroundColor: Colors.grey[900],);
 
   @override
   void initState() {
@@ -33,9 +33,9 @@ class _SettingsState extends State<Settings> {
 
   Future<bool> getSwitchState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? notify = await prefs.getBool("switchState");
+    bool? notify = prefs.getBool("switchState");
 
-    return notify != null ? notify : true;
+    return notify ?? true;
   }
 
   @override
@@ -121,9 +121,11 @@ class _SettingsState extends State<Settings> {
                                     setState(() {
                                       notify = value;
                                       saveSwitchState(value);
+                                    
+                                      // ignore: avoid_print
                                       print('Saved state is $notify');
 
-                                      if (notify == null || notify == true) {
+                                      if (notify == true) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(snackBarNotify);
                                       } else {
@@ -131,6 +133,7 @@ class _SettingsState extends State<Settings> {
                                             .showSnackBar(snackBarNotify);
                                       }
                                     });
+                                    // ignore: avoid_print
                                     print(notify);
                                   },
                                   activeTrackColor: Colors.pink[700],
