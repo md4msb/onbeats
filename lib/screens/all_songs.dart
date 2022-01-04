@@ -2,20 +2,19 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
+import 'package:music_app/providers/music_provider.dart';
 import 'package:music_app/screens/playing_song.dart';
 import 'package:music_app/screens/settings_screen.dart';
+import 'package:music_app/widgets/build_sheet.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
 import '../open_assetaudio.dart';
 import 'dart:ui';
 import 'package:music_app/widgets/snackbars.dart';
 
-
 // ignore: must_be_immutable
 class AllSongs extends StatefulWidget {
-  List<DataModel> dbSongs = [];
-  List<Audio> allSongs = [];
-  AllSongs({Key? key, required this.dbSongs, required this.allSongs})
-      : super(key: key);
+  AllSongs({Key? key}) : super(key: key);
 
   @override
   _AllSongsState createState() => _AllSongsState();
@@ -31,8 +30,8 @@ class _AllSongsState extends State<AllSongs> {
 
   final box = Boxes.getSongsDb();
 
-  final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
-  final OnAudioQuery audioQuery = OnAudioQuery();
+  final assetAudioPlayer = AssetsAudioPlayer.withId("0");
+  final audioQuery = OnAudioQuery();
 
   @override
   void initState() {
@@ -50,6 +49,10 @@ class _AllSongsState extends State<AllSongs> {
 
   @override
   Widget build(BuildContext context) {
+    MusicProvider musicProvider = Provider.of<MusicProvider>(context);
+    List<DataModel> dbSongs = musicProvider.dbSongs;
+    List<Audio> allSongs = musicProvider.audioList;
+
     return Container(
       decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -90,18 +93,17 @@ class _AllSongsState extends State<AllSongs> {
                     mainAxisSpacing: 15),
                 padding: const EdgeInsets.only(
                     left: 25, right: 25, bottom: 25, top: 5),
-                itemCount: widget.allSongs.length,
+                itemCount: allSongs.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      OpenAssetAudio(allSongs: widget.allSongs, index: index)
-                          .open();
+                      OpenAssetAudio(allSongs: allSongs, index: index).open();
 
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => PlayingScreen(
-                            songs: widget.allSongs,
+                            songs: allSongs,
                           ),
                         ),
                       );
@@ -123,10 +125,10 @@ class _AllSongsState extends State<AllSongs> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    margin:
-                                        const EdgeInsets.only(left: 30, right: 30),
+                                    margin: const EdgeInsets.only(
+                                        left: 30, right: 30),
                                     child: Text(
-                                      widget.dbSongs[index].title,
+                                      dbSongs[index].title,
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -144,20 +146,22 @@ class _AllSongsState extends State<AllSongs> {
                                     onTap: () {
                                       Navigator.of(context).pop();
                                       showModalBottomSheet(
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(
-                                                top: Radius.circular(20))),
-                                        context: context,
-                                        builder: (context) => buildSheet(
-                                            song: widget.dbSongs[index]),
-                                      );
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                      top:
+                                                          Radius.circular(20))),
+                                          context: context,
+                                          builder: (context) =>
+                                              BuildSheet(song: dbSongs[index])
+                                          // buildSheet(song: dbSongs[index]),
+                                          );
                                     },
                                   ),
                                   likedSongs!
                                           .where((element) =>
                                               element.id.toString() ==
-                                              widget.dbSongs[index].id
-                                                  .toString())
+                                              dbSongs[index].id.toString())
                                           .isEmpty
                                       ? ListTile(
                                           title: const Text("Add to Favorites"),
@@ -166,8 +170,7 @@ class _AllSongsState extends State<AllSongs> {
                                             // color: Colors.redAccent,
                                           ),
                                           onTap: () async {
-                                            likedSongs
-                                                ?.add(widget.dbSongs[index]);
+                                            likedSongs?.add(dbSongs[index]);
                                             await box.put(
                                                 "favorites", likedSongs!);
 
@@ -178,7 +181,8 @@ class _AllSongsState extends State<AllSongs> {
                                           },
                                         )
                                       : ListTile(
-                                          title: const Text("Remove from Favorites"),
+                                          title: const Text(
+                                              "Remove from Favorites"),
                                           trailing: const Icon(
                                             Icons.favorite_rounded,
                                             color: Colors.redAccent,
@@ -186,8 +190,7 @@ class _AllSongsState extends State<AllSongs> {
                                           onTap: () async {
                                             likedSongs?.removeWhere((elemet) =>
                                                 elemet.id.toString() ==
-                                                widget.dbSongs[index].id
-                                                    .toString());
+                                                dbSongs[index].id.toString());
                                             await box.put(
                                                 "favorites", likedSongs!);
                                             setState(() {});
@@ -213,7 +216,7 @@ class _AllSongsState extends State<AllSongs> {
                           width: 200,
                           child: QueryArtworkWidget(
                             artworkClipBehavior: Clip.antiAlias,
-                            id: int.parse(widget.allSongs[index].metas.id!),
+                            id: int.parse(allSongs[index].metas.id!),
                             type: ArtworkType.AUDIO,
                             artworkBorder: BorderRadius.circular(25),
                             artworkFit: BoxFit.cover,
@@ -244,7 +247,7 @@ class _AllSongsState extends State<AllSongs> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      widget.allSongs[index].metas.title!,
+                                      allSongs[index].metas.title!,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
@@ -255,8 +258,7 @@ class _AllSongsState extends State<AllSongs> {
                                       height: 6,
                                     ),
                                     Text(
-                                      widget.dbSongs[index].artist ??
-                                          "No Artist",
+                                      dbSongs[index].artist ?? "No Artist",
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.white.withOpacity(0.7),
@@ -306,112 +308,112 @@ class _AllSongsState extends State<AllSongs> {
     );
   }
 
-  Widget buildSheet({required song}) {
-    playlists = box.keys.toList();
-    return Container(
-      padding: const EdgeInsets.only(top: 20, bottom: 20),
-      child: ListView(
-        physics: const BouncingScrollPhysics(),
-        children: [
-          libraryList(
-            child: ListTile(
-              onTap: () => showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text(
-                    "Give your playlist a name",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  content: TextField(
-                    controller: controller,
-                    autofocus: true,
-                    cursorRadius: const Radius.circular(50),
-                    cursorColor: Colors.grey,
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: submit,
-                        child: Text(
-                          "CREATE",
-                          style: TextStyle(
-                            color: Colors.pink[500],
-                          ),
-                        ))
-                  ],
-                ),
-              ),
-              leading: Container(
-                height: 50,
-                width: 50,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF606060),
-                  borderRadius: BorderRadius.all(Radius.circular(17)),
-                ),
-                child: const Center(
-                    child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 28,
-                )),
-              ),
-              title: const Text(
-                "Create Playlist",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          ...playlists
-              .map((e) => e != "musics" && e != "favorites"
-                  ? libraryList(
-                      child: ListTile(
-                      onTap: () async {
-                        playlistSongs = box.get(e);
-                        List existingSongs = [];
-                        existingSongs = playlistSongs!
-                            .where((element) =>
-                                element.id.toString() == song.id.toString())
-                            .toList();
+  // Widget buildSheet({required song}) {
+  //   playlists = box.keys.toList();
+  //   return Container(
+  //     padding: const EdgeInsets.only(top: 20, bottom: 20),
+  //     child: ListView(
+  //       physics: const BouncingScrollPhysics(),
+  //       children: [
+  //         libraryList(
+  //           child: ListTile(
+  //             onTap: () => showDialog(
+  //               context: context,
+  //               builder: (context) => AlertDialog(
+  //                 title: const Text(
+  //                   "Give your playlist a name",
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(fontSize: 16),
+  //                 ),
+  //                 content: TextField(
+  //                   controller: controller,
+  //                   autofocus: true,
+  //                   cursorRadius: const Radius.circular(50),
+  //                   cursorColor: Colors.grey,
+  //                 ),
+  //                 actions: [
+  //                   TextButton(
+  //                       onPressed: submit,
+  //                       child: Text(
+  //                         "CREATE",
+  //                         style: TextStyle(
+  //                           color: Colors.pink[500],
+  //                         ),
+  //                       ))
+  //                 ],
+  //               ),
+  //             ),
+  //             leading: Container(
+  //               height: 50,
+  //               width: 50,
+  //               decoration: const BoxDecoration(
+  //                 color: Color(0xFF606060),
+  //                 borderRadius: BorderRadius.all(Radius.circular(17)),
+  //               ),
+  //               child: const Center(
+  //                   child: Icon(
+  //                 Icons.add,
+  //                 color: Colors.white,
+  //                 size: 28,
+  //               )),
+  //             ),
+  //             title: const Text(
+  //               "Create Playlist",
+  //               style: TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         ...playlists
+  //             .map((e) => e != "musics" && e != "favorites"
+  //                 ? libraryList(
+  //                     child: ListTile(
+  //                     onTap: () async {
+  //                       playlistSongs = box.get(e);
+  //                       List existingSongs = [];
+  //                       existingSongs = playlistSongs!
+  //                           .where((element) =>
+  //                               element.id.toString() == song.id.toString())
+  //                           .toList();
 
-                        if (existingSongs.isEmpty) {
-                          playlistSongs?.add(song);
-                          await box.put(e, playlistSongs!);
+  //                       if (existingSongs.isEmpty) {
+  //                         playlistSongs?.add(song);
+  //                         await box.put(e, playlistSongs!);
 
-                          setState(() {});
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBars().songAdded);
-                        } else {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBars().excistingSong);
-                        }
-                      },
-                      leading: Container(
-                        height: 50,
-                        width: 50,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("assets/images/searchpre.jpg"),
-                              fit: BoxFit.cover),
-                          borderRadius: BorderRadius.all(Radius.circular(17)),
-                        ),
-                      ),
-                      title: Text(
-                        e.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ))
-                  : Container())
-              .toList()
-        ],
-      ),
-    );
-  }
+  //                         setState(() {});
+  //                         Navigator.of(context).pop();
+  //                         ScaffoldMessenger.of(context)
+  //                             .showSnackBar(SnackBars().songAdded);
+  //                       } else {
+  //                         Navigator.of(context).pop();
+  //                         ScaffoldMessenger.of(context)
+  //                             .showSnackBar(SnackBars().excistingSong);
+  //                       }
+  //                     },
+  //                     leading: Container(
+  //                       height: 50,
+  //                       width: 50,
+  //                       decoration: const BoxDecoration(
+  //                         image: DecorationImage(
+  //                             image: AssetImage("assets/images/searchpre.jpg"),
+  //                             fit: BoxFit.cover),
+  //                         borderRadius: BorderRadius.all(Radius.circular(17)),
+  //                       ),
+  //                     ),
+  //                     title: Text(
+  //                       e.toString(),
+  //                       style: const TextStyle(
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ))
+  //                 : Container())
+  //             .toList()
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Padding libraryList({required child}) {
     return Padding(
@@ -419,23 +421,23 @@ class _AllSongsState extends State<AllSongs> {
         child: child);
   }
 
-  void submit() async {
-    playlistName = controller.text;
+  // void submit() async {
+  //   playlistName = controller.text;
 
-    List? excistingName = [];
-    if (playlists.isNotEmpty) {
-      excistingName =
-          playlists.where((element) => element == playlistName).toList();
-    }
+  //   List? excistingName = [];
+  //   if (playlists.isNotEmpty) {
+  //     excistingName =
+  //         playlists.where((element) => element == playlistName).toList();
+  //   }
 
-    if (playlistName != '' && excistingName.isEmpty) {
-      await box.put(playlistName, playlistSongs!);
-      Navigator.of(context).pop();
-      setState(() {});
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBars().excistingPlaylist);
-    }
+  //   if (playlistName != '' && excistingName.isEmpty) {
+  //     await box.put(playlistName, playlistSongs!);
+  //     Navigator.of(context).pop();
+  //     setState(() {});
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBars().excistingPlaylist);
+  //   }
 
-    controller.clear();
-  }
+  //   controller.clear();
+  // }
 }

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:music_app/database/boxes.dart';
 import 'package:music_app/database/data_model.dart';
 import 'package:music_app/screens/library_screen.dart';
+import 'package:music_app/widgets/fav_icon.dart';
+import 'package:music_app/widgets/red_fav.dart';
 import 'package:music_app/widgets/snackbars.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -261,30 +263,32 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                         element.id.toString() ==
                                         currentSong.id.toString())
                                     .isEmpty
-                                ? IconButton(
-                                    onPressed: () async {
-                                      likedSongs?.add(currentSong);
-                                      await box.put("favorites", likedSongs!);
+                                ? FavIcon(song: currentSong)
+                                // IconButton(
+                                //     onPressed: () async {
+                                //       likedSongs?.add(currentSong);
+                                //       await box.put("favorites", likedSongs!);
 
-                                      setState(() {});
-                                    },
-                                    icon: const Icon(
-                                      Icons.favorite_border_rounded,
-                                      size: 30,
-                                    ))
-                                : IconButton(
-                                    onPressed: () async {
-                                      likedSongs?.removeWhere((elemet) =>
-                                          elemet.id.toString() ==
-                                          currentSong.id.toString());
-                                      await box.put("favorites", likedSongs!);
-                                      setState(() {});
-                                    },
-                                    icon: const Icon(
-                                      Icons.favorite_rounded,
-                                      color: Colors.redAccent,
-                                      size: 30,
-                                    )),
+                                //       setState(() {});
+                                //     },
+                                //     icon: const Icon(
+                                //       Icons.favorite_border_rounded,
+                                //       size: 30,
+                                //     ))
+                                : RedFav(song: currentSong),
+                            // IconButton(
+                            //     onPressed: () async {
+                            //       likedSongs?.removeWhere((elemet) =>
+                            //           elemet.id.toString() ==
+                            //           currentSong.id.toString());
+                            //       await box.put("favorites", likedSongs!);
+                            //       setState(() {});
+                            //     },
+                            //     icon: const Icon(
+                            //       Icons.favorite_rounded,
+                            //       color: Colors.redAccent,
+                            //       size: 30,
+                            //     )),
                             IconButton(
                                 onPressed: () {
                                   showModalBottomSheet(
@@ -293,7 +297,6 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                               top: Radius.circular(20))),
                                       context: context,
                                       builder: (context) {
-                                        
                                         return buildSheet(song: currentSong);
                                       });
                                 },

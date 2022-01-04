@@ -20,44 +20,67 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final box = Boxes.getSongsDb();
-
   final assetAudioPlayer = AssetsAudioPlayer.withId("0");
   final audioQuery = OnAudioQuery();
-  int index = 0;
 
-  Audio find(List<Audio> source, String fromPath) {
-    return source.firstWhere((element) => element.path == fromPath);
-  }
+  List<SongModel> fetchedSongs = [];
+  List<DataModel> mappedSongs = [];
+  List<DataModel> dbSongs = [];
+  List<Audio> allSongs = [];
 
   @override
   void initState() {
     super.initState();
+    fetchSongs();
+  }
+
+  fetchSongs() async {
+    bool permissionStatus = await audioQuery.permissionsStatus();
+    if (!permissionStatus) {
+      await audioQuery.permissionsRequest();
+    }
+    fetchedSongs = await audioQuery.querySongs();
+    mappedSongs = fetchedSongs
+        .map((e) => DataModel(
+              title: e.title,
+              id: e.id,
+              path: e.uri!,
+              duration: e.duration,
+              artist: e.artist,
+            ))
+        .toList();
+
+    await box.put("musics", mappedSongs);
+
+    dbSongs = box.get("musics") as List<DataModel>;
+
+    converToAudioList();
+    setState(() {});
+  }
+
+  converToAudioList() {
+    for (var element in dbSongs) {
+      allSongs.add(
+        Audio.file(
+          element.path,
+          metas: Metas(
+            title: element.title,
+            id: element.id.toString(),
+            artist: element.artist,
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     MusicProvider musicProvider = Provider.of<MusicProvider>(context);
-    Provider.of<MusicProvider>(context, listen: false).fetchSongs();
+    int index = musicProvider.screenIndex;
 
-    // List<SongModel> songs = [];
-    // List<DataModel> mappedSongs = [];
-    List<DataModel> dbSongs = musicProvider.dbSongs;
-    List<Audio> allSongs = musicProvider.audioList;
-
-    Widget? screens(int index) {
-      switch (index) {
-        case 0:
-          return AllSongs(
-            allSongs: allSongs,
-            dbSongs: dbSongs,
-          );
-
-        case 1:
-          return const SearchScreen();
-
-        case 2:
-          return const LibraryScreen();
-      }
+    if (dbSongs.isNotEmpty) {
+      musicProvider.dbSongs = dbSongs;
+      musicProvider.audioList = allSongs;
     }
 
     return Builder(
@@ -69,7 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Positioned(
                 child: assetAudioPlayer.builderCurrent(
                     builder: (context, Playing? playing) {
-                  final myAudio = find(allSongs, playing!.audio.assetAudioPath);
+                  final myAudio = musicProvider.findCurrentSong(
+                      allSongs, playing!.audio.assetAudioPath);
                   return Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
@@ -201,9 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
               unselectedItemColor: Colors.white54,
               selectedItemColor: Colors.white,
               onTap: ((int x) {
-                setState(() {
-                  index = x;
-                });
+                musicProvider.changeScreen(x);
               }),
               items: const [
                 BottomNavigationBarItem(
@@ -244,19 +266,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Widget? screens(int index) {
-  //   switch (index) {
-  //     case 0:
-  //       return AllSongs(
-  //         allSongs: allSongs,
-  //         dbSongs: dbSongs,
-  //       );
+  Widget? screens(int index) {
+    switch (index) {
+      case 0:
+        return AllSongs(
+          // allSongs: allSongs,
+          // dbSongs: dbSongs,
+        );
 
-  //     case 1:
-  //       return const SearchScreen();
+      case 1:
+        return const SearchScreen();
 
-  //     case 2:
-  //       return const LibraryScreen();
-  //   }
-  // }
+      case 2:
+        return const LibraryScreen();
+    }
+  }
 }

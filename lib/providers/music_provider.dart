@@ -10,53 +10,40 @@ class MusicProvider with ChangeNotifier {
   final AssetsAudioPlayer assetAudioPlayer = AssetsAudioPlayer.withId("0");
   final OnAudioQuery audioQuery = OnAudioQuery();
 
-  List<SongModel> fetchedSongs = [];
-  List<DataModel> mappedSongs = [];
   List<DataModel> dbSongs = [];
   List<Audio> audioList = [];
 
-  fetchSongs() async {
-    bool permissionStatus = await audioQuery.permissionsStatus();
-    if (!permissionStatus) {
-      await audioQuery.permissionsRequest();
-    }
-    fetchedSongs = await audioQuery.querySongs();
-    mappedSongs = fetchedSongs
-        .map((e) => DataModel(
-              title: e.title,
-              id: e.id,
-              path: e.uri!,
-              duration: e.duration,
-              artist: e.artist,
-            ))
-        .toList();
-
-    await box.put("musics", mappedSongs);
-
-    dbSongs = box.get("musics") as List<DataModel>;
-
-    converToAudioList();
-
-    // notifyListeners();
+  Audio findCurrentSong(List<Audio> source, String fromPath) {
+    return source.firstWhere((element) => element.path == fromPath);
   }
 
-  converToAudioList() {
-    for (var element in dbSongs) {
-        audioList.add(
-          Audio.file(
-            element.path,
-            metas: Metas(
-              title: element.title,
-              id: element.id.toString(),
-              artist: element.artist,
-            ),
-          ),
-        );
-      }
-  }
-
-  refresh () {
+  update() {
     notifyListeners();
   }
 
+  int screenIndex = 0;
+  changeScreen(index) {
+    screenIndex = index;
+    notifyListeners();
+  }
+
+  bool createNewPlaylist(playlists, playlistName) {
+    List<dynamic>? playlistSongs = [];
+    List? excistingName = [];
+    if (playlists.isNotEmpty) {
+      excistingName =
+          playlists.where((element) => element == playlistName).toList();
+    }
+
+    if (playlistName != '' && excistingName!.isEmpty) {
+      box.put(playlistName, playlistSongs);
+      notifyListeners();
+      return true;
+      // Navigator.of(context).pop();
+      // setState(() {});
+    } else {
+      return false;
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBars().excistingPlaylist);
+    }
+  }
 }
